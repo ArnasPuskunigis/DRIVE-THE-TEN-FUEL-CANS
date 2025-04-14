@@ -3,8 +3,8 @@ in vec3 Position;
 in vec3 Normal;
 in vec2 TexCoord;
 
-layout (binding=1) uniform sampler2D tilesTex;
-layout (binding=2) uniform sampler2D rustTex;
+layout (binding=0) uniform sampler2D tilesTex;
+layout (binding=1) uniform sampler2D rustTex;
 layout (location = 0) out vec4 FragColor;
 
 uniform struct SpotLightInfo{

@@ -23,44 +23,45 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
     sky(100.0f),
     plane(100.0f, 100.0f, 1, 1), 
     tPrev(0){
-    mesh = ObjMesh::load("media/car.obj", true);
+    mesh = ObjMesh::load("media/f1.obj", true);
+    texTiles = Texture::loadTexture("media/texture/tiles_d.png");
+    texRust = Texture::loadTexture("media/texture/rust.png");
+    texCar = Texture::loadTexture("media/texture/f1d.png");
 }
 
 void SceneBasic_Uniform::initScene()
 {
     compile();
+
+    //Skybox
     skyboxProg.use();
     GLuint cubeTex = Texture::loadHdrCubeMap("media/texture/cube/place/place");
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTex);
 
     glEnable(GL_DEPTH_TEST);
+
+    //Camera + projection
     model = mat4(1.0f);
     view = glm::lookAt(vec3(0.0f, 4.0f, 10.0f), vec3(0.0f, 0.2f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
     projection = mat4(1.0f);
+
     angle = 0.0f;
     spin = true;
     camDistance = 10.0f;
 
+    //Plane
     planeProg.use();
-    GLuint tiles = Texture::loadTexture("media/texture/tiles_d.png");
-    GLuint rust = Texture::loadTexture("media/texture/rust.png");
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, tiles);
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, rust);
-
     planeProg.setUniform("Spot.L", vec3(0.5f));
     planeProg.setUniform("Spot.La", vec3(0.5f));
     planeProg.setUniform("Spot.Exponent", 0.5f);
     planeProg.setUniform("Spot.Cutoff", glm::radians(30.0f));
-    
-    carProg.use();
 
+    //Car
+    carProg.use();
     model = mat4(1.0f);
     view = glm::lookAt(vec3(0.0f, 4.0f, 10.0f), vec3(0.0f, 0.2f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
     projection = mat4(1.0f);
-
     carProg.setUniform("Spot.L", vec3(0.5f));
     carProg.setUniform("Spot.La", vec3(0.5f));
     carProg.setUniform("Spot.Exponent", 0.5f);
@@ -74,17 +75,14 @@ void SceneBasic_Uniform::compile()
         planeProg.compileShader("shader/multiTextureSpotToon.vert");
         planeProg.compileShader("shader/multiTextureSpotToon.frag");
         planeProg.link();
-        planeProg.use();
 
         carProg.compileShader("shader/toonSpotSingleColor.vert");
         carProg.compileShader("shader/toonSpotSingleColor.frag");
         carProg.link();
-        carProg.use();
 
         skyboxProg.compileShader("shader/skyBox.vert");
         skyboxProg.compileShader("shader/skyBox.frag");
         skyboxProg.link();
-        skyboxProg.use();
     }
     catch (GLSLProgramException& e) {
         std::cerr << "Shader compilation failed: " << e.what() << std::endl;
@@ -106,54 +104,53 @@ void SceneBasic_Uniform::render()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    //Skybox
     skyboxProg.use();
     model = mat4(1.0f);
-
-    skyboxProg.use();
     model = glm::translate(model, vec3(0.0f, 10.0f, 0.0f));
     setMatricesSkybox();
-    skyboxProg.use();
     sky.render();
 
-    planeProg.use();
+    //Camera
     view = glm::lookAt(vec3(0.0f, 4.0f, camDistance), vec3(0.0f, 0.2f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
-
     vec4 lightPos = vec4(0.0f, 20.0f, 5.0f, 1.0f);
-    planeProg.setUniform("Spot.Position", vec3(view * lightPos));
     mat3 normalMatrix = mat3(vec3(view[0]), vec3(view[1]), vec3(view[2]));
-    planeProg.setUniform("Spot.Direction", normalMatrix * vec3(-lightPos));
 
-    carProg.use();
-    view = glm::lookAt(vec3(0.0f, 4.0f, camDistance), vec3(0.0f, 0.2f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
-
-    lightPos = vec4(0.0f, 20.0f, 5.0f, 1.0f);
-    carProg.setUniform("Spot.Position", vec3(view * lightPos));
-    normalMatrix = mat3(vec3(view[0]), vec3(view[1]), vec3(view[2]));
-    carProg.setUniform("Spot.Direction", normalMatrix * vec3(-lightPos));
-    
+    //Plane
     planeProg.use();
+    planeProg.setUniform("Spot.Position", vec3(view * lightPos));
+    planeProg.setUniform("Spot.Direction", normalMatrix * vec3(-lightPos));
     planeProg.setUniform("Material.Kd", vec3(0.0f, 0.0f, 0.0f));
     planeProg.setUniform("Material.Ks", vec3(0.1f, 0.1f, 0.1f));
     planeProg.setUniform("Material.Ka", vec3(0.2f, 0.2f, 0.2f));
     planeProg.setUniform("Material.Shininess", 100.0f);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texTiles);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, texRust);
     model = mat4(1.0f);
-    planeProg.use();
     setMatricesPlane();
     plane.render();
 
+    //Car
     carProg.use();
+    carProg.setUniform("Spot.Position", vec3(view * lightPos));
+    carProg.setUniform("Spot.Direction", normalMatrix * vec3(-lightPos));
+
     carProg.setUniform("Material.Kd", vec3(0.0f, 0.0f, 1.0f));
     carProg.setUniform("Material.Ks", vec3(0.95f, 0.95f, 0.95f));
     carProg.setUniform("Material.Ka", vec3(0.2f, 0.2f, 0.2f));
     carProg.setUniform("Material.Shininess", 100.0f);
-    model = mat4(1.0f);
 
-    carProg.use();
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texCar);
+    model = mat4(1.0f);
     model = glm::rotate(model, glm::radians(angle * 100.0f), vec3(0.0f, 1.0f, 0.0f));
     model = glm::translate(model, vec3(0.0f, 2.0f, 0.0f));
+    model = glm::scale(model, vec3(0.02f));
     setMatricesCar();
     mesh->render();
-
     
 }
 

@@ -18,6 +18,9 @@ private:
     SkyBox sky;
     Plane plane;
     float tPrev;
+    GLuint texTiles;
+    GLuint texRust;
+    GLuint texCar;
     std::unique_ptr<ObjMesh> mesh;
     float angle;
     bool spin;
