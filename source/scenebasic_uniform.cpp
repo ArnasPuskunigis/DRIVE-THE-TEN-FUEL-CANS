@@ -35,7 +35,13 @@ void SceneBasic_Uniform::initScene()
 
     //Skybox
     skyboxProg.use();
+
+    skyboxProg.setUniform("Fog.MaxDist", 75.0f);
+    skyboxProg.setUniform("Fog.MinDist", 1.0f);
+    skyboxProg.setUniform("Fog.Color", vec3(0.5f, 0.5f, 0.5f));
+
     GLuint cubeTex = Texture::loadHdrCubeMap("media/texture/cube/place/place");
+
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTex);
 
@@ -57,6 +63,10 @@ void SceneBasic_Uniform::initScene()
     planeProg.setUniform("Spot.Exponent", 0.5f);
     planeProg.setUniform("Spot.Cutoff", glm::radians(30.0f));
 
+    planeProg.setUniform("Fog.MaxDist", 30.0f);
+    planeProg.setUniform("Fog.MinDist", 1.0f);
+    planeProg.setUniform("Fog.Color", vec3(0.5f, 0.5f, 0.5f));
+
     //Car
     carProg.use();
     model = mat4(1.0f);
@@ -66,6 +76,11 @@ void SceneBasic_Uniform::initScene()
     carProg.setUniform("Spot.La", vec3(0.5f));
     carProg.setUniform("Spot.Exponent", 0.5f);
     carProg.setUniform("Spot.Cutoff", glm::radians(30.0f));
+
+    carProg.setUniform("Fog.MaxDist", 30.0f);
+    carProg.setUniform("Fog.MinDist", 1.0f);
+    carProg.setUniform("Fog.Color", vec3(0.5f, 0.5f, 0.5f));
+
 
 }
 
@@ -180,10 +195,12 @@ void SceneBasic_Uniform::setMatricesCar() {
 
 void SceneBasic_Uniform::setMatricesSkybox() {
     skyboxProg.use();
-    mat4 mv = view * model;
-    skyboxProg.setUniform("ModelViewMatrix", mv);
-    skyboxProg.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
-    skyboxProg.setUniform("MVP", projection * mv);
+
+    skyboxProg.setUniform("ModelMatrix", model);
+    skyboxProg.setUniform("ViewMatrix", view);
+    skyboxProg.setUniform("ProjectionMatrix", projection);
+    skyboxProg.setUniform("CameraPos", glm::vec3(glm::inverse(view)[3]));
+
 }
 
 void SceneBasic_Uniform::upPressed() {
