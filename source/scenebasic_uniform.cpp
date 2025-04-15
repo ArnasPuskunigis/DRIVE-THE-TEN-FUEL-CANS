@@ -24,8 +24,11 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
     plane(100.0f, 100.0f, 1, 1), 
     tPrev(0),
     tPrevPbr(0.0f),
-    lightPos(vec4(5.0f, 5.0f, 5.0f, 1.0f))
-
+    lightPos(vec4(5.0f, 5.0f, 5.0f, 1.0f)),
+    particleLifeTime(10.5f),
+    nParticles(800),
+    emitterPos(10,20,10),
+    emitterDir(-10,20,0)
     {
     mesh = ObjMesh::load("media/f1.obj", true);
     texTiles = Texture::loadTexture("media/texture/tiles_d.png");
@@ -44,13 +47,31 @@ void SceneBasic_Uniform::initScene()
     //skyboxProg.setUniform("Fog.MinDist", 1.0f);
     //skyboxProg.setUniform("Fog.Color", vec3(0.5f, 0.5f, 0.5f));
 
-    GLuint cubeTex = Texture::loadHdrCubeMap("media/texture/cube/place/place");
+    //GLuint cubeTex = Texture::loadHdrCubeMap("media/texture/cube/place/place");
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTex);
+    //glActiveTexture(GL_TEXTURE0);
+    //glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTex);
+
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glEnable(GL_DEPTH_TEST);
     glFrontFace(GL_CW);
+
+    initBuffers();
+    glActiveTexture(GL_TEXTURE0);
+    Texture::loadTexture("media/texture/bluewater.png");
+
+    particleProg.use();
+    particleProg.setUniform("ParticleTex", 0);
+    particleProg.setUniform("ParticleLifeTime", particleLifeTime);
+    particleProg.setUniform("ParticleSize", 1.0f);
+    particleProg.setUniform("Gravity", vec3(0.0f, 9.8f, 0.0f));
+    particleProg.setUniform("EmitterPos", emitterPos);
+
+    flatProg.use();
+    flatProg.setUniform("Color", glm::vec4(0.4f, 0.4f, 0.4f, 1.0f));
 
     //Camera + projection
     model = mat4(1.0f);
@@ -113,9 +134,39 @@ void SceneBasic_Uniform::initScene()
 void SceneBasic_Uniform::compile()
 {
     try {
-        prog.compileShader("shader/pbr.vert");
-        prog.compileShader("shader/pbr.frag");
-        prog.link();
+        
+        // Compile and link car program
+        try {
+            prog.compileShader("shader/pbr.vert");
+            prog.compileShader("shader/pbr.frag");
+            prog.link();
+            std::cout << "car fine!" << std::endl;
+        }
+        catch (GLSLProgramException& e) {
+            std::cerr << "Error compiling/linking car program: " << e.what() << std::endl;
+        }
+
+        // Compile and link flat program
+        try {
+            flatProg.compileShader("shader/solid.vert");
+            flatProg.compileShader("shader/solid.frag");
+            flatProg.link();
+            std::cout << "flat fine!" << std::endl;
+        }
+        catch (GLSLProgramException& e) {
+            std::cerr << "Error compiling/linking flat program: " << e.what() << std::endl;
+        }
+
+        // Compile and link particle program
+        try {
+            particleProg.compileShader("shader/particle.vert");
+            particleProg.compileShader("shader/particle.frag");
+            particleProg.link();
+            std::cout << "particle fine!" << std::endl;
+        }
+        catch (GLSLProgramException& e) {
+            std::cerr << "Error compiling/linking particle program: " << e.what() << std::endl;
+        }
 
         //planeProg.compileShader("shader/multiTextureSpotToon.vert");
         //planeProg.compileShader("shader/multiTextureSpotToon.frag");
@@ -153,10 +204,16 @@ void SceneBasic_Uniform::update(float t)
     lightPos.y = 3.0f;
     lightPos.z = sin(lightAngle) * 7.0f;
 
+    time = t;
+    angle = std::fmod(angle + 0.01f, glm::two_pi<float>());
+
+
 }
 
 void SceneBasic_Uniform::render()
 {
+    particleProg.use();
+    particleProg.setUniform("Time", time);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     ////Skybox
@@ -188,9 +245,24 @@ void SceneBasic_Uniform::render()
     //setMatricesPlane();
     //plane.render();
 
+    model = mat4(1.0f);
     prog.use();
     prog.setUniform("Light[0].Position", view * lightPos);
     drawScene();
+
+    flatProg.use();
+    setMatrices(flatProg);
+    grid.render();
+
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glDepthMask(GL_FALSE);
+    particleProg.use();
+    setMatrices(particleProg);
+
+    glBindVertexArray(particles);
+    glDrawArraysInstanced(GL_TRIANGLES, 0, 6, nParticles);
+    glBindVertexArray(0);
+    glDepthMask(GL_TRUE);
 
     //Car
     /*carProg.use();
@@ -303,6 +375,71 @@ void SceneBasic_Uniform::setMatricesSkybox() {
     skyboxProg.setUniform("ProjectionMatrix", projection);
     skyboxProg.setUniform("CameraPos", glm::vec3(glm::inverse(view)[3]));
 
+}
+
+void SceneBasic_Uniform::setMatrices(GLSLProgram &program) {
+    mat4 mv = view * model;
+    program.setUniform("ModelViewMatrix", mv);
+    //particleProg.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
+    program.setUniform("MVP", projection * mv);
+    program.setUniform("ProjectionMatrix", projection);
+}
+
+void SceneBasic_Uniform::initBuffers() {
+
+    glGenBuffers(1, &initVel);
+    glGenBuffers(1, &startTime);
+    int size = nParticles * sizeof(float);
+    glBindBuffer(GL_ARRAY_BUFFER, initVel);
+    glBufferData(GL_ARRAY_BUFFER, size * 3, 0, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, startTime);
+    glBufferData(GL_ARRAY_BUFFER, size, 0, GL_STATIC_DRAW);
+
+    glm::mat3 emitterBasis = ParticleUtils::makeArbitraryBasis(emitterDir);
+    vec3 v(0.0f);
+    float velocity, theta, phi;
+    std::vector<GLfloat> data(nParticles * 3);
+
+    for (uint32_t i = 0; i < nParticles; i++) {
+        theta = glm::mix(0.0f, glm::pi<float>() / 4.0f, randFloat()); 
+        phi = glm::mix(0.0f, glm::two_pi<float>(), randFloat());
+
+        v.x = sinf(theta) * cosf(phi);
+        v.y = cosf(theta);
+        v.z = sinf(theta) * sinf(phi);
+
+        velocity = glm::mix(1.25f, 1.5f, randFloat());
+        v = glm::normalize(emitterBasis * v) * velocity;
+
+        data[3 * i] = v.x;
+        data[3 * i + 1] = v.y;
+        data[3 * i + 2] = v.z;
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, initVel);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, size * 3, data.data());
+    float rate = particleLifeTime / nParticles;
+    for (int i = 0; i < nParticles; i++) {
+        data[i] = rate * i;
+    }
+    glBindBuffer(GL_ARRAY_BUFFER, startTime);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, nParticles * sizeof(float), data.data());
+    glBindBuffer(GL_ARRAY_BUFFER, 1);
+    glGenVertexArrays(1, &particles);
+    glBindVertexArray(particles);
+    glBindBuffer(GL_ARRAY_BUFFER, initVel);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, startTime);
+    glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribDivisor(0, 1);
+    glVertexAttribDivisor(1, 1);
+    glBindVertexArray(0);
+}
+
+float SceneBasic_Uniform::randFloat() {
+    return rand.nextFloat();
 }
 
 void SceneBasic_Uniform::upPressed() {

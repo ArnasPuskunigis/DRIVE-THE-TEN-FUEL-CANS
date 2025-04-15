@@ -149,6 +149,7 @@
     <ClCompile Include="helper\cube.cpp" />
     <ClCompile Include="helper\glslprogram.cpp" />
     <ClCompile Include="helper\glutils.cpp" />
+    <ClCompile Include="helper\grid.cpp" />
     <ClCompile Include="helper\objmesh.cpp" />
     <ClCompile Include="helper\plane.cpp" />
     <ClCompile Include="helper\skybox.cpp" />
@@ -161,10 +162,14 @@
     <ClCompile Include="scenebasic_uniform.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="pbr.frag" />
-    <None Include="pbr.vert" />
     <None Include="shader\multiTextureSpotToon.frag" />
     <None Include="shader\multiTextureSpotToon.vert" />
+    <None Include="shader\particle.frag" />
+    <None Include="shader\particle.vert" />
+    <None Include="shader\pbr.frag" />
+    <None Include="shader\pbr.vert" />
+    <None Include="shader\solid.frag" />
+    <None Include="shader\solid.vert" />
     <None Include="shader\toonSpotSingleColor.frag" />
     <None Include="shader\toonSpotSingleColor.vert" />
     <None Include="shader\skyBox.frag" />
@@ -176,8 +181,11 @@
     <ClInclude Include="helper\drawable.h" />
     <ClInclude Include="helper\glslprogram.h" />
     <ClInclude Include="helper\glutils.h" />
+    <ClInclude Include="helper\grid.h" />
     <ClInclude Include="helper\objmesh.h" />
+    <ClInclude Include="helper\particleutils.h" />
     <ClInclude Include="helper\plane.h" />
+    <ClInclude Include="helper\random.h" />
     <ClInclude Include="helper\scene.h" />
     <ClInclude Include="helper\scenerunner.h" />
     <ClInclude Include="helper\skybox.h" />

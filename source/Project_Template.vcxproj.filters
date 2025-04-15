@@ -69,6 +69,9 @@
     <ClCompile Include="helper\stb\stb_image.cpp">
       <Filter>helper\stb</Filter>
     </ClCompile>
+    <ClCompile Include="helper\grid.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shader\multiTextureSpotToon.frag">
@@ -89,10 +92,22 @@
     <None Include="shader\skyBox.vert">
       <Filter>shaders</Filter>
     </None>
-    <None Include="pbr.frag">
+    <None Include="shader\pbr.frag">
       <Filter>shaders</Filter>
     </None>
-    <None Include="pbr.vert">
+    <None Include="shader\pbr.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shader\particle.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shader\particle.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shader\solid.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shader\solid.vert">
       <Filter>shaders</Filter>
     </None>
   </ItemGroup>
@@ -153,6 +168,15 @@
     </ClInclude>
     <ClInclude Include="helper\stb\stb_image_write.h">
       <Filter>helper\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\grid.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\particleutils.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\random.h">
+      <Filter>helper</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

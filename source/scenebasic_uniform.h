@@ -12,6 +12,9 @@
 #include "helper/teapot.h"
 #include "helper/objmesh.h"
 #include "helper/skybox.h"
+#include "helper/random.h"
+#include "helper/grid.h"
+#include "helper/particleutils.h"
 
 class SceneBasic_Uniform : public Scene
 {
@@ -26,6 +29,7 @@ private:
     float angle;
     bool spin;
     float camDistance;
+    float time;
     GLSLProgram planeProg;
     GLSLProgram carProg;
     GLSLProgram skyboxProg;
@@ -38,6 +42,19 @@ private:
     void drawScene();
     void drawFloor();
     void drawSpot(const glm::vec3& pos, float rough, int metal, const glm::vec3& color);
+
+    GLSLProgram particleProg;
+    float particleLifeTime;
+    GLSLProgram flatProg;
+    Random rand;
+    GLuint initVel, startTime, particles, nParticles;
+    Grid grid;
+    glm::vec3 emitterPos, emitterDir;
+
+    void initBuffers();
+    float randFloat();
+
+    void setMatrices(GLSLProgram&);
 
     void setMatricesPlane();
     //void setMatricesCar();
