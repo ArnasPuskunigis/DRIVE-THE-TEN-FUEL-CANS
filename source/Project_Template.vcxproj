@@ -161,6 +161,8 @@
     <ClCompile Include="scenebasic_uniform.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="pbr.frag" />
+    <None Include="pbr.vert" />
     <None Include="shader\multiTextureSpotToon.frag" />
     <None Include="shader\multiTextureSpotToon.vert" />
     <None Include="shader\toonSpotSingleColor.frag" />

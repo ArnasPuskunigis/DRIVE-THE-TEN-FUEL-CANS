@@ -89,6 +89,12 @@
     <None Include="shader\skyBox.vert">
       <Filter>shaders</Filter>
     </None>
+    <None Include="pbr.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="pbr.vert">
+      <Filter>shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="scenebasic_uniform.h">

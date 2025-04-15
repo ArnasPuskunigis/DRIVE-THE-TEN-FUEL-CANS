@@ -9,13 +9,14 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "glm/glm.hpp"
 #include "helper/plane.h"
+#include "helper/teapot.h"
 #include "helper/objmesh.h"
 #include "helper/skybox.h"
 
 class SceneBasic_Uniform : public Scene
 {
 private:
-    SkyBox sky;
+    //SkyBox sky;
     Plane plane;
     float tPrev;
     GLuint texTiles;
@@ -28,9 +29,20 @@ private:
     GLSLProgram planeProg;
     GLSLProgram carProg;
     GLSLProgram skyboxProg;
+    GLSLProgram prog;
+
+    float tPrevPbr, lightAngle, lightRotationSpeed;
+    glm::vec4 lightPos;
+
+    void setMatricesTeapot();
+    void drawScene();
+    void drawFloor();
+    void drawSpot(const glm::vec3& pos, float rough, int metal, const glm::vec3& color);
+
     void setMatricesPlane();
-    void setMatricesCar();
+    //void setMatricesCar();
     void setMatricesSkybox();
+    void setMatricesPbr();
     void compile();
 
 public:
