@@ -72,6 +72,9 @@
     <ClCompile Include="helper\grid.cpp">
       <Filter>helper</Filter>
     </ClCompile>
+    <ClCompile Include="helper\fuelPickup.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shader\multiTextureSpotToon.frag">
@@ -176,6 +179,9 @@
       <Filter>helper</Filter>
     </ClInclude>
     <ClInclude Include="helper\random.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\fuelPickup.h">
       <Filter>helper</Filter>
     </ClInclude>
   </ItemGroup>

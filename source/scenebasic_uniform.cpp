@@ -18,22 +18,21 @@ using glm::vec4;
 using glm::mat3;
 using glm::mat4;
 
-
 SceneBasic_Uniform::SceneBasic_Uniform() :
     sky(500.0f),
     plane(100.0f, 100.0f, 1, 1),
-    tPrev(0),
-    tPrevPbr(0.0f),
-    lightPos2(vec4(5.0f, 5.0f, 5.0f, 1.0f)),
+    fuelCan(vec3(10.0f, 1.0f, 10.0f), 2.0f),
+    lightPos(vec4(10.0f, 5.0f, 10.0f, 1.0f)),
     particleLifeTime(300.0f),
     nParticles(800),
     emitterPos(250, 50, 0),
     emitterDir(90, 1, -120),
-    carPos(0.0f, 1.0f, 0.0f)
+    carPos(0.0f, 1.0f, 0.0f),
+    carForward(0.0f, 1.0f, 0.0f),
+    carFuelCount(100.0f),
+    fuelLossRate(1.0f)
     {
     mesh = ObjMesh::load("media/f1.obj", true);
-    texTiles = Texture::loadTexture("media/texture/tiles_d.png");
-    texRust = Texture::loadTexture("media/texture/rust.png");
     texCar = Texture::loadTexture("media/texture/f1d.png");
     }
 
@@ -54,6 +53,7 @@ void SceneBasic_Uniform::initScene()
     glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTex);
 
 
+    //Particles
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -71,49 +71,24 @@ void SceneBasic_Uniform::initScene()
     particleProg.setUniform("Gravity", vec3(0.0f, 2.0f, 0.0f));
     particleProg.setUniform("EmitterPos", emitterPos);
 
-    flatProg.use();
-    flatProg.setUniform("Color", glm::vec4(0.4f, 0.4f, 0.4f, 1.0f));
-
-    //Camera + projection
-    model = mat4(1.0f);
-    view = glm::lookAt(vec3(0.0f, 4.0f, 10.0f), vec3(0.0f, 0.2f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
-    projection = mat4(1.0f);
-
-    angle = 0.0f;
-    spin = true;
-    camDistance = 10.0f;
-
-    ////Plane
-    //planeProg.use();
-    //planeProg.setUniform("Spot.L", vec3(0.5f));
-    //planeProg.setUniform("Spot.La", vec3(0.5f));
-    //planeProg.setUniform("Spot.Exponent", 0.5f);
-    //planeProg.setUniform("Spot.Cutoff", glm::radians(30.0f));
-
-    //planeProg.setUniform("Fog.MaxDist", 30.0f);
-    //planeProg.setUniform("Fog.MinDist", 1.0f);
-    //planeProg.setUniform("Fog.Color", vec3(0.5f, 0.5f, 0.5f));
-
-    //pbr
-    prog.use();
+    //PBR Car + Plane
+    pbrProg.use();
     view = lookAt(
         vec3(0.0f, 4.0f, 7.0f),
         vec3(0.0f, 0.0f, 0.0f),
         vec3(0.0f, 1.0f, 0.0f)
     );
 
+    //Lighting for PBR
+    pbrProg.use();
+    pbrProg.setUniform("Light[0].L", vec3(45.0f));
+    pbrProg.setUniform("Light[0].Position", view * lightPos);
+    pbrProg.setUniform("Light[1].L", vec3(0.3f));
+    pbrProg.setUniform("Light[1].Position", vec4(0.0f, 0.15f, -1.0f, 0.0f));
+    pbrProg.setUniform("Light[2].L", vec3(45.0f));
+    pbrProg.setUniform("Light[2].Position", vec4(-7.0f, 3.0f, 7.0f, 1.0f));
 
-    projection = perspective(radians(50.0f), (float)width / height, 0.5f, 10000.0f);
-    lightAngle = 0.0f;
-    lightRotationSpeed = 1.5f;
-    
-    prog.use();
-    prog.setUniform("Light[0].L", vec3(45.0f));
-    prog.setUniform("Light[0].Position", view * lightPos2);
-    prog.setUniform("Light[1].L", vec3(0.3f));
-    prog.setUniform("Light[1].Position", vec4(0.0f, 0.15f, -1.0f, 0.0f));
-    prog.setUniform("Light[2].L", vec3(45.0f));
-    prog.setUniform("Light[2].Position", vec4(-7.0f, 3.0f, 7.0f, 1.0f));
+    std::cout << "Car fuel count:" << carFuelCount << std::endl;
 
     //Car
    /* carProg.use();
@@ -136,37 +111,24 @@ void SceneBasic_Uniform::compile()
 {
     try {
         
-        // Compile and link car program
         try {
-            prog.compileShader("shader/pbr.vert");
-            prog.compileShader("shader/pbr.frag");
-            prog.link();
-            std::cout << "car fine!" << std::endl;
+            pbrProg.compileShader("shader/pbr.vert");
+            pbrProg.compileShader("shader/pbr.frag");
+            pbrProg.link();
+            std::cout << "pbr shader fine!" << std::endl;
         }
         catch (GLSLProgramException& e) {
-            std::cerr << "Error compiling/linking car program: " << e.what() << std::endl;
+            std::cerr << "Error compiling: " << e.what() << std::endl;
         }
 
-        // Compile and link flat program
-        try {
-            flatProg.compileShader("shader/solid.vert");
-            flatProg.compileShader("shader/solid.frag");
-            flatProg.link();
-            std::cout << "flat fine!" << std::endl;
-        }
-        catch (GLSLProgramException& e) {
-            std::cerr << "Error compiling/linking flat program: " << e.what() << std::endl;
-        }
-
-        // Compile and link particle program
         try {
             particleProg.compileShader("shader/particle.vert");
             particleProg.compileShader("shader/particle.frag");
             particleProg.link();
-            std::cout << "particle fine!" << std::endl;
+            std::cout << "particle shader fine!" << std::endl;
         }
         catch (GLSLProgramException& e) {
-            std::cerr << "Error compiling/linking particle program: " << e.what() << std::endl;
+            std::cerr << "Error compiling: " << e.what() << std::endl;
         }
 
         //planeProg.compileShader("shader/multiTextureSpotToon.vert");
@@ -188,34 +150,22 @@ void SceneBasic_Uniform::compile()
 
 void SceneBasic_Uniform::update(float t)
 {
-    //if (spin) {
-    //    float deltaT = t - tPrev;
-    //    if (tPrev == 0.0f) deltaT = 0.0f;
-    //    tPrev = t;
-    //    angle += 0.2f * deltaT;
-    //    if (angle > glm::two_pi<float>()) angle -= glm::two_pi<float>();
-    //}
-
-    /*float deltaT = t - tPrevPbr;
-    if (tPrevPbr == 0.0f) deltaT = 0.0f;
-    tPrevPbr = t;
-
-    lightAngle = glm::mod(lightAngle + deltaT * lightRotationSpeed, two_pi<float>());
-    lightPos2.x = cos(lightAngle) * 7.0f;
-    lightPos2.y = 3.0f;
-    lightPos2.z = sin(lightAngle) * 7.0f;*/
-
     time = t;
-    angle = std::fmod(angle + 0.01f, glm::two_pi<float>());
 
+    float delta = t - previousTime;
+    timeElapsed += delta;
 
+    if (timeElapsed >= fuelLossRate) {
+        timeElapsed = 0.0f;
+        carFuelCount -= 5.0f;
+        std::cout << carFuelCount << std::endl;
+    }
+
+    previousTime = t;
 }
 
 void SceneBasic_Uniform::render()
 {
-    particleProg.use();
-    particleProg.setUniform("Time", time);
-    //particleProg.setUniform("EmitterPos", emitterPos);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     //Skybox
@@ -226,45 +176,35 @@ void SceneBasic_Uniform::render()
     sky.render();
 
     //Camera
-    view = glm::lookAt(vec3(0.0f, 4.0f, camDistance), vec3(0.0f, 0.2f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
-    vec4 lightPos = vec4(0.0f, 20.0f, 5.0f, 1.0f);
-    mat3 normalMatrix = mat3(vec3(view[0]), vec3(view[1]), vec3(view[2]));
+    float camDistance = 15.0f;
+    float camHeight = 5.0f;
+    vec3 camPos = carPos - carForward * camDistance + glm::vec3(0, camHeight, 0);
+    view = glm::lookAt(camPos, carPos + vec3(0, 1.0f, 0), vec3(0, 1, 0));
 
-    ////Plane
-    //planeProg.use();
-    //planeProg.setUniform("Spot.Position", vec3(view * lightPos));
-    //planeProg.setUniform("Spot.Direction", normalMatrix * vec3(-lightPos));
-    //planeProg.setUniform("Material.Kd", vec3(0.0f, 0.0f, 0.0f));
-    //planeProg.setUniform("Material.Ks", vec3(0.1f, 0.1f, 0.1f));
-    //planeProg.setUniform("Material.Ka", vec3(0.2f, 0.2f, 0.2f));
-    //planeProg.setUniform("Material.Shininess", 100.0f);
-
-    //glActiveTexture(GL_TEXTURE0);
-    //glBindTexture(GL_TEXTURE_2D, texTiles);
-    //glActiveTexture(GL_TEXTURE1);
-    //glBindTexture(GL_TEXTURE_2D, texRust);
-    //model = mat4(1.0f);
-    //setMatricesPlane();
-    //plane.render();
-
-    model = mat4(1.0f);
-    prog.use();
-    prog.setUniform("Light[0].Position", view * lightPos2);
+    //Scene (pbr car + floor + light)
     drawScene();
+    pbrProg.setUniform("Light[0].Position", view * lightPos);
 
-    flatProg.use();
-    setMatrices(flatProg);
-    grid.render();
-
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //Particles
     glDepthMask(GL_FALSE);
     particleProg.use();
+    particleProg.setUniform("Time", time);
     setMatrices(particleProg);
 
     glBindVertexArray(particles);
     glDrawArraysInstanced(GL_TRIANGLES, 0, 6, nParticles);
     glBindVertexArray(0);
     glDepthMask(GL_TRUE);
+
+    //Fuel cans
+    if (!fuelCan.isCollected()) {
+        if (fuelCan.checkCollision(carPos, 2.0f)) {
+            std::cout << "Fuel collected!" << std::endl;
+            carFuelCount += 40.0f;
+            std::cout << "Car fuel at: " << carFuelCount << std::endl;
+        }
+        
+    }   
 
     //Car
     /*carProg.use();
@@ -287,6 +227,11 @@ void SceneBasic_Uniform::render()
     
 }
 
+bool SceneBasic_Uniform::checkCollision(glm::vec3 posA, float radiusA, glm::vec3 posB, float radiusB) {
+    float distance = glm::length(posA - posB);
+    return distance < (radiusA + radiusB);
+}
+
 void SceneBasic_Uniform::resize(int w, int h)
 {
     glViewport(0, 0, w, h);
@@ -298,31 +243,15 @@ void SceneBasic_Uniform::resize(int w, int h)
 void SceneBasic_Uniform::drawScene()
 {
     drawFloor();
-
-    //int numCars = 9;
-    //vec3 baseColor(0.1f, 0.33f, 0.97f);
-
-    //for (int i = 0; i < numCars; i++) {
-    //    float carX = i * (20.0f / (numCars - 1)) - 5.0f;
-    //    float rough = (i + 1) * (1.0f / numCars);
-    //    drawSpot(vec3(carX, 0.0f, 0.0f), rough, 0, baseColor);
-    //}
-
-    float metalRough = 0.43f;
-    drawCar(vec3(carPos), metalRough, 1, vec3(1.0f, 0.71f, 0.29f));
-    //drawCar(vec3(-5.0f, 0.0f, 3.0f), metalRough, 1, vec3(0.95f, 0.71f, 0.54f));
-    //drawCar(vec3(-0.0f, 0.0f, 3.0f), metalRough, 1, vec3(0.91f, 0.71f, 0.92f));
-    //drawCar(vec3(5.0f, 0.0f, 3.0f), metalRough, 1, vec3(0.542f, 0.71f, 0.449f));
-    //drawCar(vec3(10.0f, 0.0f, 3.0f), metalRough, 1, vec3(0.95f, 0.71f, 0.88f));
-
+    drawCar(vec3(carPos), 0.43f, 1, vec3(1.0f, 0.71f, 0.29f));
 }
 
 void SceneBasic_Uniform::drawFloor()
 {
-    prog.use();
-    prog.setUniform("Material.Rough", 0.9f);
-    prog.setUniform("Material.Metal", 0.0f);
-    prog.setUniform("Material.Color", vec3(0.2f));
+    pbrProg.use();
+    pbrProg.setUniform("Material.Rough", 0.9f);
+    pbrProg.setUniform("Material.Metal", 0.0f);
+    pbrProg.setUniform("Material.Color", vec3(0.2f));
 
     model = mat4(1.0f);
     model = translate(model, vec3(0.0f, -0.75f, 0.0f));
@@ -332,10 +261,10 @@ void SceneBasic_Uniform::drawFloor()
 
 void SceneBasic_Uniform::drawCar(const glm::vec3& pos, float rough, int metal, const glm::vec3& color)
 {
-    prog.use();
-    prog.setUniform("Material.Rough", rough);
-    prog.setUniform("Material.Metal", metal);
-    prog.setUniform("Material.Color", color);
+    pbrProg.use();
+    pbrProg.setUniform("Material.Rough", rough);
+    pbrProg.setUniform("Material.Metal", metal);
+    pbrProg.setUniform("Material.Color", color);
 
     model = mat4(1.0f);
     model = translate(model, vec3(pos));
@@ -347,19 +276,20 @@ void SceneBasic_Uniform::drawCar(const glm::vec3& pos, float rough, int metal, c
 }
 
 void SceneBasic_Uniform::setMatricesPlane() {
-    prog.use();
+    pbrProg.use();
     mat4 mv = view * model;
-    prog.setUniform("ModelViewMatrix", mv);
-    prog.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
-    prog.setUniform("MVP", projection * mv);
+    pbrProg.setUniform("ModelViewMatrix", mv);
+    pbrProg.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
+    pbrProg.setUniform("MVP", projection * mv);
 }
 
 void SceneBasic_Uniform::setMatricesPbr() {
-    prog.use();
+    pbrProg.use();
+    
     mat4 mv = view * model;
-    prog.setUniform("ModelViewMatrix", mv);
-    prog.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
-    prog.setUniform("MVP", projection * mv);
+    pbrProg.setUniform("ModelViewMatrix", mv);
+    pbrProg.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
+    pbrProg.setUniform("MVP", projection * mv);
 }
 
 //void SceneBasic_Uniform::setMatricesCar() {
@@ -383,7 +313,7 @@ void SceneBasic_Uniform::setMatricesSkybox() {
 void SceneBasic_Uniform::setMatrices(GLSLProgram &program) {
     mat4 mv = view * model;
     program.setUniform("ModelViewMatrix", mv);
-    //particleProg.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
+    //program.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
     program.setUniform("MVP", projection * mv);
     program.setUniform("ProjectionMatrix", projection);
 }
@@ -446,43 +376,19 @@ float SceneBasic_Uniform::randFloat() {
 }
 
 void SceneBasic_Uniform::upPressed() {
-    //camDistance -= 0.1f;
-
     carPos += carForward * 0.1f;
 }
 
-
-
-void SceneBasic_Uniform::spinToggle() {
-    if (spin) {
-        spin = false;
-    }
-    else {
-        spin = true;
-    }
-}
-
 void SceneBasic_Uniform::downPressed() {
-    //camDistance += 0.1f;
-    //carXPos += 0.1f;
-
     carPos -= carForward * 0.1f;
 }
 
 void SceneBasic_Uniform::leftPressed() {
-    //camDistance -= 0.1f;
-    //carXPos -= 0.1f;
-
-    float turnSpeed = 1.0f;
-    carAngle += turnSpeed;
+    carAngle += 1.0f;
 
 }
 
 void SceneBasic_Uniform::rightPressed() {
-    //camDistance -= 0.1f;
-    //carXPos -= 0.1f;
-
-    float turnSpeed = 1.0f;
-    carAngle -= turnSpeed;
+    carAngle -= 1.0f;
 
 }

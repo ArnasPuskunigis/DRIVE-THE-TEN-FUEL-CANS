@@ -15,30 +15,25 @@
 #include "helper/random.h"
 #include "helper/grid.h"
 #include "helper/particleutils.h"
+#include "helper/fuelPickup.h"
 
 class SceneBasic_Uniform : public Scene
 {
 private:
     SkyBox sky;
     Plane plane;
-    float tPrev;
-    GLuint texTiles;
-    GLuint texRust;
+    fuelPickup fuelCan;
+
     GLuint texCar;
     std::unique_ptr<ObjMesh> mesh;
-    float angle;
-    bool spin;
-    float camDistance;
     float time;
     GLSLProgram planeProg;
     GLSLProgram carProg;
     GLSLProgram skyboxProg;
-    GLSLProgram prog;
+    GLSLProgram pbrProg;
 
-    float tPrevPbr, lightAngle, lightRotationSpeed;
-    glm::vec4 lightPos2;
+    glm::vec4 lightPos;
 
-    void setMatricesTeapot();
     void drawScene();
     void drawFloor();
     void drawCar(const glm::vec3& pos, float rough, int metal, const glm::vec3& color);
@@ -55,11 +50,17 @@ private:
     float carAngle;
     glm::vec3 carForward;
 
+    float carFuelCount;
+    float previousTime;
+    float timeElapsed;
+    float fuelLossRate;
+    
     void initBuffers();
     float randFloat();
 
+    bool checkCollision(glm::vec3, float, glm::vec3, float);
+    
     void setMatrices(GLSLProgram&);
-
     void setMatricesPlane();
     //void setMatricesCar();
     void setMatricesSkybox();
@@ -77,7 +78,6 @@ public:
     void downPressed();
     void leftPressed();
     void rightPressed();
-    void spinToggle();
 };
 
 #endif // SCENEBASIC_UNIFORM_H

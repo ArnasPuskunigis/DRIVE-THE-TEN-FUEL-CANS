@@ -135,10 +135,6 @@ private:
                 scene.upPressed();
             }
             
-            if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-                scene.spinToggle();
-            }
-
             if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
                 scene.downPressed();
             }

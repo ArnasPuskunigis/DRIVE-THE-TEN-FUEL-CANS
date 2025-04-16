@@ -41,7 +41,6 @@ public:
     virtual void resize(int, int) = 0;
     
     virtual void upPressed() = 0;
-    virtual void spinToggle() = 0;
     virtual void downPressed() = 0;
     virtual void leftPressed() = 0;
     virtual void rightPressed() = 0;
