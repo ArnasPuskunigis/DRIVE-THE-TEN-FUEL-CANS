@@ -21,14 +21,15 @@ using glm::mat4;
 
 SceneBasic_Uniform::SceneBasic_Uniform() :
     sky(500.0f),
-    plane(100.0f, 100.0f, 1, 1), 
+    plane(100.0f, 100.0f, 1, 1),
     tPrev(0),
     tPrevPbr(0.0f),
     lightPos2(vec4(5.0f, 5.0f, 5.0f, 1.0f)),
     particleLifeTime(300.0f),
     nParticles(800),
-    emitterPos(250,50,0),
-    emitterDir(90,1,-120)
+    emitterPos(250, 50, 0),
+    emitterDir(90, 1, -120),
+    carPos(0.0f, 1.0f, 0.0f)
     {
     mesh = ObjMesh::load("media/f1.obj", true);
     texTiles = Texture::loadTexture("media/texture/tiles_d.png");
@@ -195,14 +196,14 @@ void SceneBasic_Uniform::update(float t)
     //    if (angle > glm::two_pi<float>()) angle -= glm::two_pi<float>();
     //}
 
-    float deltaT = t - tPrevPbr;
+    /*float deltaT = t - tPrevPbr;
     if (tPrevPbr == 0.0f) deltaT = 0.0f;
     tPrevPbr = t;
 
     lightAngle = glm::mod(lightAngle + deltaT * lightRotationSpeed, two_pi<float>());
     lightPos2.x = cos(lightAngle) * 7.0f;
     lightPos2.y = 3.0f;
-    lightPos2.z = sin(lightAngle) * 7.0f;
+    lightPos2.z = sin(lightAngle) * 7.0f;*/
 
     time = t;
     angle = std::fmod(angle + 0.01f, glm::two_pi<float>());
@@ -308,7 +309,7 @@ void SceneBasic_Uniform::drawScene()
     //}
 
     float metalRough = 0.43f;
-    drawCar(vec3(0.0f, 1.0f, 0.0f), metalRough, 1, vec3(1.0f, 0.71f, 0.29f));
+    drawCar(vec3(carPos), metalRough, 1, vec3(1.0f, 0.71f, 0.29f));
     //drawCar(vec3(-5.0f, 0.0f, 3.0f), metalRough, 1, vec3(0.95f, 0.71f, 0.54f));
     //drawCar(vec3(-0.0f, 0.0f, 3.0f), metalRough, 1, vec3(0.91f, 0.71f, 0.92f));
     //drawCar(vec3(5.0f, 0.0f, 3.0f), metalRough, 1, vec3(0.542f, 0.71f, 0.449f));
@@ -337,11 +338,12 @@ void SceneBasic_Uniform::drawCar(const glm::vec3& pos, float rough, int metal, c
     prog.setUniform("Material.Color", color);
 
     model = mat4(1.0f);
-    model = translate(model, pos);
-    model = rotate(model, radians(0.0f), vec3(0.0f, 1.0f, 0.0f));
+    model = translate(model, vec3(pos));
+    model = rotate(model, radians(carAngle), vec3(0.0f, 1.0f, 0.0f));
     model = glm::scale(model, vec3(0.02f));
     setMatricesPbr();
     mesh->render();
+    carForward = -glm::normalize(glm::vec3(model[0]));
 }
 
 void SceneBasic_Uniform::setMatricesPlane() {
@@ -444,8 +446,12 @@ float SceneBasic_Uniform::randFloat() {
 }
 
 void SceneBasic_Uniform::upPressed() {
-    camDistance -= 0.1f;
+    //camDistance -= 0.1f;
+
+    carPos += carForward * 0.1f;
 }
+
+
 
 void SceneBasic_Uniform::spinToggle() {
     if (spin) {
@@ -457,5 +463,26 @@ void SceneBasic_Uniform::spinToggle() {
 }
 
 void SceneBasic_Uniform::downPressed() {
-    camDistance += 0.1f;
+    //camDistance += 0.1f;
+    //carXPos += 0.1f;
+
+    carPos -= carForward * 0.1f;
+}
+
+void SceneBasic_Uniform::leftPressed() {
+    //camDistance -= 0.1f;
+    //carXPos -= 0.1f;
+
+    float turnSpeed = 1.0f;
+    carAngle += turnSpeed;
+
+}
+
+void SceneBasic_Uniform::rightPressed() {
+    //camDistance -= 0.1f;
+    //carXPos -= 0.1f;
+
+    float turnSpeed = 1.0f;
+    carAngle -= turnSpeed;
+
 }

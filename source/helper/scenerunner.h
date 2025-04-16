@@ -143,6 +143,14 @@ private:
                 scene.downPressed();
             }
 
+            if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+                scene.leftPressed();
+            }
+
+            if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+                scene.rightPressed();
+            }
+
         }
     }
 };

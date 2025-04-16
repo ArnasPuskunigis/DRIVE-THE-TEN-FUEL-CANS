@@ -51,6 +51,10 @@ private:
     Grid grid;
     glm::vec3 emitterPos, emitterDir;
 
+    glm::vec3 carPos;
+    float carAngle;
+    glm::vec3 carForward;
+
     void initBuffers();
     float randFloat();
 
@@ -71,6 +75,8 @@ public:
     void resize(int, int);
     void upPressed();
     void downPressed();
+    void leftPressed();
+    void rightPressed();
     void spinToggle();
 };
 

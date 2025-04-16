@@ -43,6 +43,8 @@ public:
     virtual void upPressed() = 0;
     virtual void spinToggle() = 0;
     virtual void downPressed() = 0;
+    virtual void leftPressed() = 0;
+    virtual void rightPressed() = 0;
 
     void animate( bool value ) { m_animate = value; }
     bool animating() { return m_animate; }
