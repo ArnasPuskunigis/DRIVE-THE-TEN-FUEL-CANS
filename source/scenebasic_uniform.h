@@ -19,7 +19,7 @@
 class SceneBasic_Uniform : public Scene
 {
 private:
-    //SkyBox sky;
+    SkyBox sky;
     Plane plane;
     float tPrev;
     GLuint texTiles;

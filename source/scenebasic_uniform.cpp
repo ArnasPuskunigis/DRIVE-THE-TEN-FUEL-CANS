@@ -20,7 +20,7 @@ using glm::mat4;
 
 
 SceneBasic_Uniform::SceneBasic_Uniform() :
-    //sky(100.0f),
+    sky(500.0f),
     plane(100.0f, 100.0f, 1, 1), 
     tPrev(0),
     tPrevPbr(0.0f),
@@ -40,17 +40,17 @@ void SceneBasic_Uniform::initScene()
 {
     compile();
 
-    ////Skybox
-    //skyboxProg.use();
+    //Skybox
+    skyboxProg.use();
 
-    //skyboxProg.setUniform("Fog.MaxDist", 75.0f);
-    //skyboxProg.setUniform("Fog.MinDist", 1.0f);
-    //skyboxProg.setUniform("Fog.Color", vec3(0.5f, 0.5f, 0.5f));
+    skyboxProg.setUniform("Fog.MaxDist", 500.0f);
+    skyboxProg.setUniform("Fog.MinDist", 1.0f);
+    skyboxProg.setUniform("Fog.Color", vec3(0.5f, 0.5f, 0.5f));
 
-    //GLuint cubeTex = Texture::loadHdrCubeMap("media/texture/cube/place/place");
+    GLuint cubeTex = Texture::loadHdrCubeMap("media/texture/cube/place/place");
 
-    //glActiveTexture(GL_TEXTURE0);
-    //glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTex);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTex);
 
 
     glEnable(GL_BLEND);
@@ -102,7 +102,7 @@ void SceneBasic_Uniform::initScene()
     );
 
 
-    projection = perspective(radians(50.0f), (float)width / height, 0.5f, 100.0f);
+    projection = perspective(radians(50.0f), (float)width / height, 0.5f, 10000.0f);
     lightAngle = 0.0f;
     lightRotationSpeed = 1.5f;
     
@@ -176,9 +176,9 @@ void SceneBasic_Uniform::compile()
         carProg.compileShader("shader/toonSpotSingleColor.frag");
         carProg.link();*/
 
-        //skyboxProg.compileShader("shader/skyBox.vert");
-        //skyboxProg.compileShader("shader/skyBox.frag");
-        //skyboxProg.link();
+        skyboxProg.compileShader("shader/skyBox.vert");
+        skyboxProg.compileShader("shader/skyBox.frag");
+        skyboxProg.link();
     }
     catch (GLSLProgramException& e) {
         std::cerr << "Shader compilation failed: " << e.what() << std::endl;
@@ -217,12 +217,12 @@ void SceneBasic_Uniform::render()
     //particleProg.setUniform("EmitterPos", emitterPos);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    ////Skybox
-    //skyboxProg.use();
-    //model = mat4(1.0f);
-    //model = glm::translate(model, vec3(0.0f, 10.0f, 0.0f));
-    //setMatricesSkybox();
-    //sky.render();
+    //Skybox
+    skyboxProg.use();
+    model = mat4(1.0f);
+    model = glm::translate(model, vec3(0.0f, 10.0f, 0.0f));
+    setMatricesSkybox();
+    sky.render();
 
     //Camera
     view = glm::lookAt(vec3(0.0f, 4.0f, camDistance), vec3(0.0f, 0.2f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
@@ -291,7 +291,7 @@ void SceneBasic_Uniform::resize(int w, int h)
     glViewport(0, 0, w, h);
     width = w;
     height = h;
-    projection = glm::perspective(glm::radians(70.0f), (float)w / h, 0.3f, 100.0f);
+    projection = glm::perspective(glm::radians(70.0f), (float)w / h, 0.3f, 1000.0f);
 }
 
 void SceneBasic_Uniform::drawScene()
