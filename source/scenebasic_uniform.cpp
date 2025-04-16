@@ -24,13 +24,13 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
     plane(100.0f, 100.0f, 1, 1), 
     tPrev(0),
     tPrevPbr(0.0f),
-    lightPos(vec4(5.0f, 5.0f, 5.0f, 1.0f)),
-    particleLifeTime(10.5f),
+    lightPos2(vec4(5.0f, 5.0f, 5.0f, 1.0f)),
+    particleLifeTime(300.0f),
     nParticles(800),
-    emitterPos(10,20,10),
-    emitterDir(-10,20,0)
+    emitterPos(0,100,0),
+    emitterDir(90,1,-120)
     {
-    mesh = ObjMesh::load("media/f1.obj", true);
+    mesh = ObjMesh::load("media/porshe.obj", true);
     texTiles = Texture::loadTexture("media/texture/tiles_d.png");
     texRust = Texture::loadTexture("media/texture/rust.png");
     texCar = Texture::loadTexture("media/texture/f1d.png");
@@ -61,13 +61,13 @@ void SceneBasic_Uniform::initScene()
 
     initBuffers();
     glActiveTexture(GL_TEXTURE0);
-    Texture::loadTexture("media/texture/bluewater.png");
+    Texture::loadTexture("media/texture/smoke.png");
 
     particleProg.use();
     particleProg.setUniform("ParticleTex", 0);
     particleProg.setUniform("ParticleLifeTime", particleLifeTime);
-    particleProg.setUniform("ParticleSize", 1.0f);
-    particleProg.setUniform("Gravity", vec3(0.0f, 9.8f, 0.0f));
+    particleProg.setUniform("ParticleSize", 2.0f);
+    particleProg.setUniform("Gravity", vec3(0.0f, 2.0f, 0.0f));
     particleProg.setUniform("EmitterPos", emitterPos);
 
     flatProg.use();
@@ -108,7 +108,7 @@ void SceneBasic_Uniform::initScene()
     
     prog.use();
     prog.setUniform("Light[0].L", vec3(45.0f));
-    prog.setUniform("Light[0].Position", view * lightPos);
+    prog.setUniform("Light[0].Position", view * lightPos2);
     prog.setUniform("Light[1].L", vec3(0.3f));
     prog.setUniform("Light[1].Position", vec4(0.0f, 0.15f, -1.0f, 0.0f));
     prog.setUniform("Light[2].L", vec3(45.0f));
@@ -200,9 +200,9 @@ void SceneBasic_Uniform::update(float t)
     tPrevPbr = t;
 
     lightAngle = glm::mod(lightAngle + deltaT * lightRotationSpeed, two_pi<float>());
-    lightPos.x = cos(lightAngle) * 7.0f;
-    lightPos.y = 3.0f;
-    lightPos.z = sin(lightAngle) * 7.0f;
+    lightPos2.x = cos(lightAngle) * 7.0f;
+    lightPos2.y = 3.0f;
+    lightPos2.z = sin(lightAngle) * 7.0f;
 
     time = t;
     angle = std::fmod(angle + 0.01f, glm::two_pi<float>());
@@ -214,6 +214,7 @@ void SceneBasic_Uniform::render()
 {
     particleProg.use();
     particleProg.setUniform("Time", time);
+    //particleProg.setUniform("EmitterPos", emitterPos);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     ////Skybox
@@ -247,7 +248,7 @@ void SceneBasic_Uniform::render()
 
     model = mat4(1.0f);
     prog.use();
-    prog.setUniform("Light[0].Position", view * lightPos);
+    prog.setUniform("Light[0].Position", view * lightPos2);
     drawScene();
 
     flatProg.use();
@@ -408,7 +409,7 @@ void SceneBasic_Uniform::initBuffers() {
         v.y = cosf(theta);
         v.z = sinf(theta) * sinf(phi);
 
-        velocity = glm::mix(1.25f, 1.5f, randFloat());
+        velocity = glm::mix(10.0f, 25.0f, randFloat());
         v = glm::normalize(emitterBasis * v) * velocity;
 
         data[3 * i] = v.x;
@@ -424,7 +425,7 @@ void SceneBasic_Uniform::initBuffers() {
     }
     glBindBuffer(GL_ARRAY_BUFFER, startTime);
     glBufferSubData(GL_ARRAY_BUFFER, 0, nParticles * sizeof(float), data.data());
-    glBindBuffer(GL_ARRAY_BUFFER, 1);
+    //glBindBuffer(GL_ARRAY_BUFFER, 1);
     glGenVertexArrays(1, &particles);
     glBindVertexArray(particles);
     glBindBuffer(GL_ARRAY_BUFFER, initVel);

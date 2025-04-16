@@ -36,7 +36,7 @@ private:
     GLSLProgram prog;
 
     float tPrevPbr, lightAngle, lightRotationSpeed;
-    glm::vec4 lightPos;
+    glm::vec4 lightPos2;
 
     void setMatricesTeapot();
     void drawScene();
