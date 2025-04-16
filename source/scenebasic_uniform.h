@@ -41,7 +41,7 @@ private:
     void setMatricesTeapot();
     void drawScene();
     void drawFloor();
-    void drawSpot(const glm::vec3& pos, float rough, int metal, const glm::vec3& color);
+    void drawCar(const glm::vec3& pos, float rough, int metal, const glm::vec3& color);
 
     GLSLProgram particleProg;
     float particleLifeTime;

@@ -27,10 +27,10 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
     lightPos2(vec4(5.0f, 5.0f, 5.0f, 1.0f)),
     particleLifeTime(300.0f),
     nParticles(800),
-    emitterPos(0,100,0),
+    emitterPos(250,50,0),
     emitterDir(90,1,-120)
     {
-    mesh = ObjMesh::load("media/porshe.obj", true);
+    mesh = ObjMesh::load("media/f1.obj", true);
     texTiles = Texture::loadTexture("media/texture/tiles_d.png");
     texRust = Texture::loadTexture("media/texture/rust.png");
     texCar = Texture::loadTexture("media/texture/f1d.png");
@@ -298,21 +298,21 @@ void SceneBasic_Uniform::drawScene()
 {
     drawFloor();
 
-    int numCars = 9;
-    vec3 baseColor(0.1f, 0.33f, 0.97f);
+    //int numCars = 9;
+    //vec3 baseColor(0.1f, 0.33f, 0.97f);
 
-    for (int i = 0; i < numCars; i++) {
-        float carX = i * (20.0f / (numCars - 1)) - 5.0f;
-        float rough = (i + 1) * (1.0f / numCars);
-        drawSpot(vec3(carX, 0.0f, 0.0f), rough, 0, baseColor);
-    }
+    //for (int i = 0; i < numCars; i++) {
+    //    float carX = i * (20.0f / (numCars - 1)) - 5.0f;
+    //    float rough = (i + 1) * (1.0f / numCars);
+    //    drawSpot(vec3(carX, 0.0f, 0.0f), rough, 0, baseColor);
+    //}
 
     float metalRough = 0.43f;
-    drawSpot(vec3(-10.0f, 0.0f, 3.0f), metalRough, 1, vec3(1.0f, 0.71f, 0.29f));
-    drawSpot(vec3(-5.0f, 0.0f, 3.0f), metalRough, 1, vec3(0.95f, 0.71f, 0.29f));
-    drawSpot(vec3(-0.0f, 0.0f, 3.0f), metalRough, 1, vec3(0.91f, 0.71f, 0.29f));
-    drawSpot(vec3(5.0f, 0.0f, 3.0f), metalRough, 1, vec3(0.542f, 0.71f, 0.29f));
-    drawSpot(vec3(10.0f, 0.0f, 3.0f), metalRough, 1, vec3(0.95f, 0.71f, 0.29f));
+    drawCar(vec3(0.0f, 1.0f, 0.0f), metalRough, 1, vec3(1.0f, 0.71f, 0.29f));
+    //drawCar(vec3(-5.0f, 0.0f, 3.0f), metalRough, 1, vec3(0.95f, 0.71f, 0.54f));
+    //drawCar(vec3(-0.0f, 0.0f, 3.0f), metalRough, 1, vec3(0.91f, 0.71f, 0.92f));
+    //drawCar(vec3(5.0f, 0.0f, 3.0f), metalRough, 1, vec3(0.542f, 0.71f, 0.449f));
+    //drawCar(vec3(10.0f, 0.0f, 3.0f), metalRough, 1, vec3(0.95f, 0.71f, 0.88f));
 
 }
 
@@ -329,7 +329,7 @@ void SceneBasic_Uniform::drawFloor()
     plane.render();
 }
 
-void SceneBasic_Uniform::drawSpot(const glm::vec3& pos, float rough, int metal, const glm::vec3& color)
+void SceneBasic_Uniform::drawCar(const glm::vec3& pos, float rough, int metal, const glm::vec3& color)
 {
     prog.use();
     prog.setUniform("Material.Rough", rough);
@@ -338,7 +338,7 @@ void SceneBasic_Uniform::drawSpot(const glm::vec3& pos, float rough, int metal, 
 
     model = mat4(1.0f);
     model = translate(model, pos);
-    model = rotate(model, radians(90.0f), vec3(0.0f, 1.0f, 0.0f));
+    model = rotate(model, radians(0.0f), vec3(0.0f, 1.0f, 0.0f));
     model = glm::scale(model, vec3(0.02f));
     setMatricesPbr();
     mesh->render();
