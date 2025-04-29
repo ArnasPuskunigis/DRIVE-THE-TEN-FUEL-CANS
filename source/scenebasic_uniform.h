@@ -24,11 +24,15 @@ private:
     Plane plane;
     fuelPickup fuelCan;
 
+
     GLuint texCar;
+    GLuint fuelTex;
+    GLuint particleTex;
     std::unique_ptr<ObjMesh> mesh;
+    std::unique_ptr<ObjMesh> fuelMesh;
     float time;
     GLSLProgram planeProg;
-    GLSLProgram carProg;
+    GLSLProgram fuelCanProg;
     GLSLProgram skyboxProg;
     GLSLProgram pbrProg;
 
@@ -37,6 +41,8 @@ private:
     void drawScene();
     void drawFloor();
     void drawCar(const glm::vec3& pos, float rough, int metal, const glm::vec3& color);
+    //void drawFuelCan(const glm::vec3& pos, float rough, int metal, const glm::vec3& color);
+
 
     GLSLProgram particleProg;
     float particleLifeTime;
@@ -62,7 +68,7 @@ private:
     
     void setMatrices(GLSLProgram&);
     void setMatricesPlane();
-    //void setMatricesCar();
+    void setMatricesCar();
     void setMatricesSkybox();
     void setMatricesPbr();
     void compile();

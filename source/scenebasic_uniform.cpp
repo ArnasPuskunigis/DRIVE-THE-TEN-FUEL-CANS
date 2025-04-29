@@ -33,7 +33,10 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
     fuelLossRate(1.0f)
     {
     mesh = ObjMesh::load("media/f1.obj", true);
+    fuelMesh = ObjMesh::load("media/fuel_can.obj", true);
     texCar = Texture::loadTexture("media/texture/f1d.png");
+    fuelTex = Texture::loadTexture("media/texture/fuel_can_Albedo.png");
+    particleTex = Texture::loadTexture("media/texture/fuel_can_Albedo.png");
     }
 
 void SceneBasic_Uniform::initScene()
@@ -46,6 +49,8 @@ void SceneBasic_Uniform::initScene()
     skyboxProg.setUniform("Fog.MaxDist", 500.0f);
     skyboxProg.setUniform("Fog.MinDist", 1.0f);
     skyboxProg.setUniform("Fog.Color", vec3(0.5f, 0.5f, 0.5f));
+
+    
 
     GLuint cubeTex = Texture::loadHdrCubeMap("media/texture/cube/place/place");
 
@@ -62,7 +67,7 @@ void SceneBasic_Uniform::initScene()
 
     initBuffers();
     glActiveTexture(GL_TEXTURE0);
-    Texture::loadTexture("media/texture/smoke.png");
+    particleTex = Texture::loadTexture("media/texture/smoke.png");
 
     particleProg.use();
     particleProg.setUniform("ParticleTex", 0);
@@ -70,6 +75,22 @@ void SceneBasic_Uniform::initScene()
     particleProg.setUniform("ParticleSize", 2.0f);
     particleProg.setUniform("Gravity", vec3(0.0f, 2.0f, 0.0f));
     particleProg.setUniform("EmitterPos", emitterPos);
+
+    //Can
+    fuelCanProg.use();
+    model = mat4(1.0f);
+    view = glm::lookAt(vec3(0.0f, 4.0f, 10.0f), vec3(0.0f, 0.2f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+    projection = mat4(1.0f);
+    fuelCanProg.setUniform("Spot.L", vec3(0.5f));
+    fuelCanProg.setUniform("Spot.La", vec3(0.5f));
+    fuelCanProg.setUniform("Spot.Exponent", 0.5f);
+    fuelCanProg.setUniform("Spot.Cutoff", glm::radians(30.0f));
+
+    fuelCanProg.setUniform("Fog.MaxDist", 50.0f);
+    fuelCanProg.setUniform("Fog.MinDist", 1.0f);
+    fuelCanProg.setUniform("Fog.Color", vec3(0.5f, 0.5f, 0.5f));
+
+    std::cout << "Car fuel count:" << carFuelCount << std::endl;
 
     //PBR Car + Plane
     pbrProg.use();
@@ -87,23 +108,6 @@ void SceneBasic_Uniform::initScene()
     pbrProg.setUniform("Light[1].Position", vec4(0.0f, 0.15f, -1.0f, 0.0f));
     pbrProg.setUniform("Light[2].L", vec3(45.0f));
     pbrProg.setUniform("Light[2].Position", vec4(-7.0f, 3.0f, 7.0f, 1.0f));
-
-    std::cout << "Car fuel count:" << carFuelCount << std::endl;
-
-    //Car
-   /* carProg.use();
-    model = mat4(1.0f);
-    view = glm::lookAt(vec3(0.0f, 4.0f, 10.0f), vec3(0.0f, 0.2f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
-    projection = mat4(1.0f);
-    carProg.setUniform("Spot.L", vec3(0.5f));
-    carProg.setUniform("Spot.La", vec3(0.5f));
-    carProg.setUniform("Spot.Exponent", 0.5f);
-    carProg.setUniform("Spot.Cutoff", glm::radians(30.0f));
-
-    carProg.setUniform("Fog.MaxDist", 30.0f);
-    carProg.setUniform("Fog.MinDist", 1.0f);
-    carProg.setUniform("Fog.Color", vec3(0.5f, 0.5f, 0.5f));*/
-
 
 }
 
@@ -135,9 +139,9 @@ void SceneBasic_Uniform::compile()
         //planeProg.compileShader("shader/multiTextureSpotToon.frag");
         //planeProg.link();
 
-        /*carProg.compileShader("shader/toonSpotSingleColor.vert");
-        carProg.compileShader("shader/toonSpotSingleColor.frag");
-        carProg.link();*/
+        fuelCanProg.compileShader("shader/toonSpotSingleColor.vert");
+        fuelCanProg.compileShader("shader/toonSpotSingleColor.frag");
+        fuelCanProg.link();
 
         skyboxProg.compileShader("shader/skyBox.vert");
         skyboxProg.compileShader("shader/skyBox.frag");
@@ -181,11 +185,34 @@ void SceneBasic_Uniform::render()
     vec3 camPos = carPos - carForward * camDistance + glm::vec3(0, camHeight, 0);
     view = glm::lookAt(camPos, carPos + vec3(0, 1.0f, 0), vec3(0, 1, 0));
 
+    //Can
+    fuelCanProg.use();
+
+    //mat4 mv = view * model;
+    fuelCanProg.setUniform("Spot.Position", vec3(view * lightPos));
+    //fuelCanProg.setUniform("Spot.Direction", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2]) * vec3(-lightPos)));
+
+    fuelCanProg.setUniform("Material.Kd", vec3(0.0f, 0.0f, 1.0f));
+    fuelCanProg.setUniform("Material.Ks", vec3(0.95f, 0.95f, 0.95f));
+    fuelCanProg.setUniform("Material.Ka", vec3(0.2f, 0.2f, 0.2f));
+    fuelCanProg.setUniform("Material.Shininess", 100.0f);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, fuelTex);
+    model = mat4(1.0f);
+    //model = glm::rotate(model, glm::radians(angle * 100.0f), vec3(0.0f, 1.0f, 0.0f));
+    //model = glm::translate(model, vec3(0.0f, 2.0f, 0.0f));
+    model = glm::scale(model, vec3(0.1f));
+    setMatricesCar();
+    fuelMesh->render();
+
     //Scene (pbr car + floor + light)
     drawScene();
     pbrProg.setUniform("Light[0].Position", view * lightPos);
 
+
     //Particles
+    glBindTexture(GL_TEXTURE_2D, particleTex);
     glDepthMask(GL_FALSE);
     particleProg.use();
     particleProg.setUniform("Time", time);
@@ -206,24 +233,7 @@ void SceneBasic_Uniform::render()
         
     }   
 
-    //Car
-    /*carProg.use();
-    carProg.setUniform("Spot.Position", vec3(view * lightPos));
-    carProg.setUniform("Spot.Direction", normalMatrix * vec3(-lightPos));
-
-    carProg.setUniform("Material.Kd", vec3(0.0f, 0.0f, 1.0f));
-    carProg.setUniform("Material.Ks", vec3(0.95f, 0.95f, 0.95f));
-    carProg.setUniform("Material.Ka", vec3(0.2f, 0.2f, 0.2f));
-    carProg.setUniform("Material.Shininess", 100.0f);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texCar);
-    model = mat4(1.0f);
-    model = glm::rotate(model, glm::radians(angle * 100.0f), vec3(0.0f, 1.0f, 0.0f));
-    model = glm::translate(model, vec3(0.0f, 2.0f, 0.0f));
-    model = glm::scale(model, vec3(0.02f));
-    setMatricesCar();
-    mesh->render();*/
+    
     
 }
 
@@ -244,6 +254,7 @@ void SceneBasic_Uniform::drawScene()
 {
     drawFloor();
     drawCar(vec3(carPos), 0.43f, 1, vec3(1.0f, 0.71f, 0.29f));
+    //drawFuelCan(vec3(10.0f, 1.0f, 10.0f), 0.43f, 1, vec3(1.0f, 0.71f, 0.29f));
 }
 
 void SceneBasic_Uniform::drawFloor()
@@ -275,6 +286,22 @@ void SceneBasic_Uniform::drawCar(const glm::vec3& pos, float rough, int metal, c
     carForward = -glm::normalize(glm::vec3(model[0]));
 }
 
+//void SceneBasic_Uniform::drawFuelCan(const glm::vec3& pos, float rough, int metal, const glm::vec3& color)
+//{
+//    pbrProg.use();
+//    pbrProg.setUniform("Material.Rough", rough);
+//    pbrProg.setUniform("Material.Metal", metal);
+//    pbrProg.setUniform("Material.Color", color);
+//
+//    model = mat4(1.0f);
+//    model = translate(model, vec3(pos));
+//    //model = rotate(model, radians(carAngle), vec3(0.0f, 1.0f, 0.0f));
+//    model = glm::scale(model, vec3(0.02f));
+//    setMatricesPbr();
+//    fuelMesh->render();
+//    //carForward = -glm::normalize(glm::vec3(model[0]));
+//}
+
 void SceneBasic_Uniform::setMatricesPlane() {
     pbrProg.use();
     mat4 mv = view * model;
@@ -292,13 +319,13 @@ void SceneBasic_Uniform::setMatricesPbr() {
     pbrProg.setUniform("MVP", projection * mv);
 }
 
-//void SceneBasic_Uniform::setMatricesCar() {
-//    carProg.use();
-//    mat4 mv = view * model;
-//    carProg.setUniform("ModelViewMatrix", mv);
-//    carProg.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
-//    carProg.setUniform("MVP", projection * mv);
-//}
+void SceneBasic_Uniform::setMatricesCar() {
+    fuelCanProg.use();
+    mat4 mv = view * model;
+    fuelCanProg.setUniform("ModelViewMatrix", mv);
+    fuelCanProg.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
+    fuelCanProg.setUniform("MVP", projection * mv);
+}
 
 void SceneBasic_Uniform::setMatricesSkybox() {
     skyboxProg.use();
