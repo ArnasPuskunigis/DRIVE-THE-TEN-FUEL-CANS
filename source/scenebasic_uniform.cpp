@@ -24,7 +24,7 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
     fuelCanCount(10),
     fuelCansRemaining(fuelCanCount),
     fuelCan(),
-    lightPos(vec4(10.0f, 5.0f, 10.0f, 1.0f)),
+    lightPos(vec4(0.0f, 5.0f, 0.0f, 1.0f)),
     particleLifeTime(300.0f),
     nParticles(800),
     emitterPos(250, 50, 0),
@@ -121,10 +121,10 @@ void SceneBasic_Uniform::initScene()
     pbrProg.use();
     pbrProg.setUniform("Light[0].L", vec3(45.0f));
     pbrProg.setUniform("Light[0].Position", view * lightPos);
-    pbrProg.setUniform("Light[1].L", vec3(0.3f));
-    pbrProg.setUniform("Light[1].Position", vec4(0.0f, 0.15f, -1.0f, 0.0f));
+    pbrProg.setUniform("Light[1].L", vec3(45.0f));
+    pbrProg.setUniform("Light[1].Position", view * vec4(50.0f, 5.0f, 50.0f, 1.0f));
     pbrProg.setUniform("Light[2].L", vec3(45.0f));
-    pbrProg.setUniform("Light[2].Position", vec4(-7.0f, 3.0f, 7.0f, 1.0f));
+    pbrProg.setUniform("Light[2].Position", view * vec4(-50.0f, 5.0f, -50.0f, 1.0f));
 
 }
 
@@ -210,7 +210,7 @@ void SceneBasic_Uniform::render()
     vec3 camPos = carPos - carForward * camDistance + glm::vec3(0, camHeight, 0);
     view = glm::lookAt(camPos, carPos + vec3(0, 1.0f, 0), vec3(0, 1, 0));
 
-    
+    //std::cout << "Car: " << carPos.x << " " << carPos.z << std::endl;
     
     //Fuel cans
 
@@ -250,6 +250,8 @@ void SceneBasic_Uniform::render()
     //Scene (pbr car + floor + light)
     drawScene();
     pbrProg.setUniform("Light[0].Position", view * lightPos);
+    pbrProg.setUniform("Light[1].Position", view * vec4(50.0f, 5.0f, 50.0f, 1.0f));
+    pbrProg.setUniform("Light[2].Position", view * vec4(-50.0f, 5.0f, -50.0f, 1.0f));
 
 
     //Particles
