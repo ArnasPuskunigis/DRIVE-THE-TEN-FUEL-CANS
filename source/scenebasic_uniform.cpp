@@ -20,7 +20,7 @@ using glm::mat4;
 
 SceneBasic_Uniform::SceneBasic_Uniform() :
     sky(500.0f),
-    plane(100.0f, 100.0f, 1, 1),
+    plane(1000.0f, 1000.0f, 1, 1),
     fuelCan(vec3(10.0f, 1.0f, 10.0f), 2.0f),
     lightPos(vec4(10.0f, 5.0f, 10.0f, 1.0f)),
     particleLifeTime(300.0f),
@@ -207,6 +207,10 @@ void SceneBasic_Uniform::render()
         }
     }
 
+
+    model = mat4(1.0f);
+    drawFloor();
+
     //Scene (pbr car + floor + light)
     drawScene();
     pbrProg.setUniform("Light[0].Position", view * lightPos);
@@ -245,7 +249,6 @@ void SceneBasic_Uniform::resize(int w, int h)
 
 void SceneBasic_Uniform::drawScene()
 {
-    drawFloor();
     drawCar(vec3(carPos), 0.43f, 1, vec3(1.0f, 0.71f, 0.29f));
     //drawFuelCan(vec3(10.0f, 1.0f, 10.0f), 0.43f, 1, vec3(1.0f, 0.71f, 0.29f));
 }
@@ -267,16 +270,35 @@ void SceneBasic_Uniform::drawFuelCan()
 
 void SceneBasic_Uniform::drawFloor()
 {
-    pbrProg.use();
-    pbrProg.setUniform("Material.Rough", 0.9f);
-    pbrProg.setUniform("Material.Metal", 0.0f);
-    pbrProg.setUniform("Material.Color", vec3(0.2f));
+    fuelCanProg.use();
 
+    //mat4 mv = view * model;
+    fuelCanProg.setUniform("Spot.Position", vec3(view * lightPos));
+    //fuelCanProg.setUniform("Spot.Direction", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2]) * vec3(-lightPos)));
+
+    fuelCanProg.setUniform("Material.Kd", vec3(0.0f, 0.0f, 1.0f));
+    fuelCanProg.setUniform("Material.Ks", vec3(0.95f, 0.95f, 0.95f));
+    fuelCanProg.setUniform("Material.Ka", vec3(0.2f, 0.2f, 0.2f));
+    fuelCanProg.setUniform("Material.Shininess", 100.0f);
+    
     model = mat4(1.0f);
     model = translate(model, vec3(0.0f, -0.75f, 0.0f));
     setMatricesPlane();
     plane.render();
 }
+//
+//void SceneBasic_Uniform::drawFloor()
+//{
+//    pbrProg.use();
+//    pbrProg.setUniform("Material.Rough", 0.9f);
+//    pbrProg.setUniform("Material.Metal", 0.0f);
+//    pbrProg.setUniform("Material.Color", vec3(0.2f));
+//
+//    model = mat4(1.0f);
+//    model = translate(model, vec3(0.0f, -0.75f, 0.0f));
+//    setMatricesPlane();
+//    plane.render();
+//}
 
 void SceneBasic_Uniform::drawCar(const glm::vec3& pos, float rough, int metal, const glm::vec3& color)
 {
@@ -311,11 +333,11 @@ void SceneBasic_Uniform::drawCar(const glm::vec3& pos, float rough, int metal, c
 //}
 
 void SceneBasic_Uniform::setMatricesPlane() {
-    pbrProg.use();
+    fuelCanProg.use();
     mat4 mv = view * model;
-    pbrProg.setUniform("ModelViewMatrix", mv);
-    pbrProg.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
-    pbrProg.setUniform("MVP", projection * mv);
+    fuelCanProg.setUniform("ModelViewMatrix", mv);
+    fuelCanProg.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
+    fuelCanProg.setUniform("MVP", projection * mv);
 }
 
 void SceneBasic_Uniform::setMatricesPbr() {
