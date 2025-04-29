@@ -207,7 +207,9 @@ void SceneBasic_Uniform::render()
         }
     }
 
-
+    //Plane
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, particleTex);
     model = mat4(1.0f);
     drawFloor();
 
