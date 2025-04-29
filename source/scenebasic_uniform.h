@@ -45,7 +45,8 @@ private:
 
     //void drawFuelCan(const glm::vec3& pos, float rough, int metal, const glm::vec3& color);
 
-
+    int fuelCanCount;
+    int fuelCansRemaining;
     GLSLProgram particleProg;
     float particleLifeTime;
     GLSLProgram flatProg;

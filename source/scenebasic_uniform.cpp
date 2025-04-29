@@ -21,6 +21,8 @@ using glm::mat4;
 SceneBasic_Uniform::SceneBasic_Uniform() :
     sky(500.0f),
     plane(1000.0f, 1000.0f, 1, 1),
+    fuelCanCount(10),
+    fuelCansRemaining(fuelCanCount),
     fuelCan(),
     lightPos(vec4(10.0f, 5.0f, 10.0f, 1.0f)),
     particleLifeTime(300.0f),
@@ -78,15 +80,19 @@ void SceneBasic_Uniform::initScene()
 
     //Fuel Cans
 
+    
+
     float randX = 0;
     float randZ = 0;
-    for (int i = 0; i <= 9; i++)
+    for (int i = 0; i <= fuelCanCount - 1; i++)
     {
         randX = glm::mix(-100.0f, 100.0f, randFloat());
         randZ = glm::mix(-100.0f, 100.0f, randFloat());
         fuelCan[i].updatePosition(vec3(randX, 1.0f, randZ));
+        std::cout << "FUEL CAN SPAWNED!" << std::endl;
     }
 
+    std::cout << "FUEL CANS REMAINING: " << fuelCansRemaining << "/" << fuelCanCount << std::endl;
 
     fuelCanProg.use();
     model = mat4(1.0f);
@@ -209,7 +215,7 @@ void SceneBasic_Uniform::render()
     //Fuel cans
 
 
-    for (int i = 0; i <= 9; i++) 
+    for (int i = 0; i <= fuelCanCount - 1; i++)
     {
         if (!fuelCan[i].isCollected()) {
             glActiveTexture(GL_TEXTURE0);
@@ -227,6 +233,8 @@ void SceneBasic_Uniform::render()
                 std::cout << "Fuel collected!" << std::endl;
                 carFuelCount += 40.0f;
                 std::cout << "Car fuel at: " << carFuelCount << std::endl;
+                fuelCansRemaining -= 1;
+                std::cout << "FUEL CANS REMAINING: " << fuelCansRemaining << "/" << fuelCanCount << std::endl;
             }
         }
     }
