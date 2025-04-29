@@ -21,7 +21,7 @@ using glm::mat4;
 SceneBasic_Uniform::SceneBasic_Uniform() :
     sky(500.0f),
     plane(1000.0f, 1000.0f, 1, 1),
-    fuelCan(vec3(10.0f, 1.0f, 10.0f), 2.0f),
+    fuelCan(),
     lightPos(vec4(10.0f, 5.0f, 10.0f, 1.0f)),
     particleLifeTime(300.0f),
     nParticles(800),
@@ -76,10 +76,21 @@ void SceneBasic_Uniform::initScene()
     particleProg.setUniform("Gravity", vec3(0.0f, 2.0f, 0.0f));
     particleProg.setUniform("EmitterPos", emitterPos);
 
-    //Can
+    //Fuel Cans
+
+    float randX = 0;
+    float randZ = 0;
+    for (int i = 0; i <= 9; i++)
+    {
+        randX = glm::mix(-100.0f, 100.0f, randFloat());
+        randZ = glm::mix(-100.0f, 100.0f, randFloat());
+        fuelCan[i].updatePosition(vec3(randX, 1.0f, randZ));
+    }
+
+
     fuelCanProg.use();
     model = mat4(1.0f);
-    view = glm::lookAt(vec3(0.0f, 4.0f, 10.0f), vec3(0.0f, 0.2f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+    //view = glm::lookAt(vec3(0.0f, 4.0f, 10.0f), vec3(0.0f, 0.2f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
     projection = mat4(1.0f);
     fuelCanProg.setUniform("Spot.L", vec3(0.5f));
     fuelCanProg.setUniform("Spot.La", vec3(0.5f));
@@ -197,23 +208,30 @@ void SceneBasic_Uniform::render()
     
     //Fuel cans
 
-    if (!fuelCan.isCollected()) {
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, fuelTex);
-        model = mat4(1.0f);
-        //model = glm::rotate(model, glm::radians(angle * 100.0f), vec3(0.0f, 1.0f, 0.0f));
-        //model = glm::translate(model, vec3(0.0f, 2.0f, 0.0f));
-        model = translate(model, vec3(10.0f, 1.0f, 10.0f));
-        model = glm::scale(model, vec3(0.1f));
-        setMatricesCar();
-        drawFuelCan();
-        fuelMesh->render();
-        if (fuelCan.checkCollision(carPos, 2.0f)) {
-            std::cout << "Fuel collected!" << std::endl;
-            carFuelCount += 40.0f;
-            std::cout << "Car fuel at: " << carFuelCount << std::endl;
+
+    for (int i = 0; i <= 9; i++) 
+    {
+        if (!fuelCan[i].isCollected()) {
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, fuelTex);
+            model = mat4(1.0f);
+            //model = glm::rotate(model, glm::radians(angle * 100.0f), vec3(0.0f, 1.0f, 0.0f));
+            //model = glm::translate(model, vec3(0.0f, 2.0f, 0.0f));
+            model = translate(model, fuelCan[i].position);
+            model = glm::scale(model, vec3(0.1f));
+            setMatricesCar();
+            drawFuelCan();
+            fuelMesh->render();
+
+            if (fuelCan[i].checkCollision(carPos, 2.0f)) {
+                std::cout << "Fuel collected!" << std::endl;
+                carFuelCount += 40.0f;
+                std::cout << "Car fuel at: " << carFuelCount << std::endl;
+            }
         }
     }
+
+   
 
     //Plane
     glActiveTexture(GL_TEXTURE0);

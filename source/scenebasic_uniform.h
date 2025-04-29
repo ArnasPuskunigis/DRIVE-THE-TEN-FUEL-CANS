@@ -22,7 +22,7 @@ class SceneBasic_Uniform : public Scene
 private:
     SkyBox sky;
     Plane plane;
-    fuelPickup fuelCan;
+    fuelPickup fuelCan[10];
 
 
     GLuint texCar;

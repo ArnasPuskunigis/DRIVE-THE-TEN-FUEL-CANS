@@ -2,13 +2,16 @@
 
 class fuelPickup {
 public:
-    fuelPickup(const glm::vec3& pos, float radius);
+    fuelPickup();
+    fuelPickup(glm::vec3& pos, float radius);
 
     bool checkCollision(const glm::vec3& carPos, float carRadius);
     bool isCollected() const;
+    void updatePosition(glm::vec3 pos);
+
+    glm::vec3 position;
 
 private:
-    glm::vec3 position;
     float radius;
     bool collected;
 };

@@ -2,8 +2,15 @@
 #include <glm/glm.hpp>
 #include <iostream>
 
-fuelPickup::fuelPickup(const glm::vec3& pos, float radius)
+fuelPickup::fuelPickup()
+    : position(0.0f), radius(2.0f), collected(false) {}
+
+fuelPickup::fuelPickup(glm::vec3& pos, float radius)
     : position(pos), radius(radius), collected(false) {}
+
+void fuelPickup::updatePosition(glm::vec3 pos) {
+    position = pos;
+}
 
 bool fuelPickup::checkCollision(const glm::vec3& carPos, float carRadius) {
     glm::vec3 diff = carPos - position;
