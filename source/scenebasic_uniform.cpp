@@ -185,26 +185,27 @@ void SceneBasic_Uniform::render()
     vec3 camPos = carPos - carForward * camDistance + glm::vec3(0, camHeight, 0);
     view = glm::lookAt(camPos, carPos + vec3(0, 1.0f, 0), vec3(0, 1, 0));
 
-    //Can
-    fuelCanProg.use();
+    
+    
+    //Fuel cans
 
-    //mat4 mv = view * model;
-    fuelCanProg.setUniform("Spot.Position", vec3(view * lightPos));
-    //fuelCanProg.setUniform("Spot.Direction", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2]) * vec3(-lightPos)));
-
-    fuelCanProg.setUniform("Material.Kd", vec3(0.0f, 0.0f, 1.0f));
-    fuelCanProg.setUniform("Material.Ks", vec3(0.95f, 0.95f, 0.95f));
-    fuelCanProg.setUniform("Material.Ka", vec3(0.2f, 0.2f, 0.2f));
-    fuelCanProg.setUniform("Material.Shininess", 100.0f);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, fuelTex);
-    model = mat4(1.0f);
-    //model = glm::rotate(model, glm::radians(angle * 100.0f), vec3(0.0f, 1.0f, 0.0f));
-    //model = glm::translate(model, vec3(0.0f, 2.0f, 0.0f));
-    model = glm::scale(model, vec3(0.1f));
-    setMatricesCar();
-    fuelMesh->render();
+    if (!fuelCan.isCollected()) {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, fuelTex);
+        model = mat4(1.0f);
+        //model = glm::rotate(model, glm::radians(angle * 100.0f), vec3(0.0f, 1.0f, 0.0f));
+        //model = glm::translate(model, vec3(0.0f, 2.0f, 0.0f));
+        model = translate(model, vec3(10.0f, 1.0f, 10.0f));
+        model = glm::scale(model, vec3(0.1f));
+        setMatricesCar();
+        drawFuelCan();
+        fuelMesh->render();
+        if (fuelCan.checkCollision(carPos, 2.0f)) {
+            std::cout << "Fuel collected!" << std::endl;
+            carFuelCount += 40.0f;
+            std::cout << "Car fuel at: " << carFuelCount << std::endl;
+        }
+    }
 
     //Scene (pbr car + floor + light)
     drawScene();
@@ -223,15 +224,7 @@ void SceneBasic_Uniform::render()
     glBindVertexArray(0);
     glDepthMask(GL_TRUE);
 
-    //Fuel cans
-    if (!fuelCan.isCollected()) {
-        if (fuelCan.checkCollision(carPos, 2.0f)) {
-            std::cout << "Fuel collected!" << std::endl;
-            carFuelCount += 40.0f;
-            std::cout << "Car fuel at: " << carFuelCount << std::endl;
-        }
-        
-    }   
+   
 
     
     
@@ -255,6 +248,21 @@ void SceneBasic_Uniform::drawScene()
     drawFloor();
     drawCar(vec3(carPos), 0.43f, 1, vec3(1.0f, 0.71f, 0.29f));
     //drawFuelCan(vec3(10.0f, 1.0f, 10.0f), 0.43f, 1, vec3(1.0f, 0.71f, 0.29f));
+}
+
+void SceneBasic_Uniform::drawFuelCan() 
+{
+    fuelCanProg.use();
+
+    //mat4 mv = view * model;
+    fuelCanProg.setUniform("Spot.Position", vec3(view * lightPos));
+    //fuelCanProg.setUniform("Spot.Direction", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2]) * vec3(-lightPos)));
+
+    fuelCanProg.setUniform("Material.Kd", vec3(0.0f, 0.0f, 1.0f));
+    fuelCanProg.setUniform("Material.Ks", vec3(0.95f, 0.95f, 0.95f));
+    fuelCanProg.setUniform("Material.Ka", vec3(0.2f, 0.2f, 0.2f));
+    fuelCanProg.setUniform("Material.Shininess", 100.0f);
+
 }
 
 void SceneBasic_Uniform::drawFloor()

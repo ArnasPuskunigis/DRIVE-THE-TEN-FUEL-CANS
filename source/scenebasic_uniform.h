@@ -41,6 +41,8 @@ private:
     void drawScene();
     void drawFloor();
     void drawCar(const glm::vec3& pos, float rough, int metal, const glm::vec3& color);
+    void drawFuelCan();
+
     //void drawFuelCan(const glm::vec3& pos, float rough, int metal, const glm::vec3& color);
 
 
