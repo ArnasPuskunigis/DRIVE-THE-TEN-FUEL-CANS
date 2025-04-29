@@ -159,13 +159,21 @@ void SceneBasic_Uniform::update(float t)
     float delta = t - previousTime;
     timeElapsed += delta;
 
-    if (timeElapsed >= fuelLossRate) {
-        timeElapsed = 0.0f;
-        carFuelCount -= 5.0f;
-        std::cout << carFuelCount << std::endl;
+    if (timeElapsed >= fuelLossRate)
+    {
+        if (carFuelCount > 0)
+        {
+            timeElapsed = 0.0f;
+            carFuelCount -= 5.0f;
+            std::cout << "Car fuel at: " << carFuelCount << std::endl;
+        }
+        else
+        {
+            exit(0);
+        }
     }
-
     previousTime = t;
+
 }
 
 void SceneBasic_Uniform::render()
