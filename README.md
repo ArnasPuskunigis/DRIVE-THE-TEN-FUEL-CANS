@@ -50,7 +50,11 @@ There are some assets which I took from the internet which are used in this proj
 - Provided in tutorials - Smoke Texture
 - https://hdri-skies.com/ - Skybox
 
-PBR - Used to add roughness, this makes the car look metallic and gold.
+## Code
+As mentioned in the video, this was created using a template. My contributions consist of modifying an existing template, implementing and mixing various shader techniques, and the addition of gameplay.
+
+### PBR Shader
+Used to add roughness, this makes the car look like gold.
 
 PBR Vertex Shader Image
 
