@@ -1,57 +1,74 @@
-# COMP3015 CW1
-This is my repository for my OpenGL program.
+# COMP3015 CW2
+## DRIVE: THE TEN FUEL CANS
+You just woke up in your car, in a foggy abandoned building. Your car is running out of fuel and you need to find and collect all 10 fuel cans to surivive.
 
-# OS - Visual studio - OpenGL
-- The os is Widnows 11, I am using an Nvidia 40 series card with OpenGL 4.6.
-- I used visual studio 2022 to write and test the code locally.
+## Youtube Link:
 
-# Inspiration
 
-When I was learning about blinn phong lighting, the effect blew me away, I thought wow this would look good on a car model, and it did.
-Then I found out how easy it is to make toon shading in OpenGL, I remember it being very difficult to implement in Unity some time ago.
-Therefore I decided to make a car inspector in OpenGL which lets you look at your car models in the toon shaded render.
+## User Manual
+### To Launch the Game
+-	Download the “Executable Version” folder.
+-	Run the .exe file
+### Game Objectives 
+-	Collect fuel cans, every can that you collect tops up your fuel
+-	Collect all 10 fuel cans to win before your fuel runs out
+### Game Controls
+-	Left Arrow - Turn left
+-	Right Arrow - Turn right
+-	Up Arrow - Drive forward
+-	Down Arrow - Reverse
+### Additional Information
+You can import your own car model if it is a “.obj” file. (Note that if the size is incorrect, you will need to open 3D software such as Blender and import your object, tap A to select all and then S to scale and drag your mouse to make it bigger, import the car and repeat if the size is off. Or you can enjoy the low-poly mustang with the broken AK which doesnt shoot)
+-	Navigate to the media folder and move the car.obj file into your desktop to save it incase your model does not work.
+-	Import your own .obj file and name it "car.obj" exactly.
 
-# How it works
-The code works by creating a scene in main which constructs an OpenGL window though which you see the application.
-It then compiles some shader programs, these require .vert and .frag shader files.
-These shader files communicate with the graphics card and the code and essentially tell the computer what needs to be drawn on the screen.
-The scene code sets up some variables and sends the information to the shader program.
-With each shader program you can create various effects, in this instance, I had 3 shader programs.
-- multiTextureSpotToon (used for the plane/ground)
-- toonSpotSingleColor (used for the car)
-- skyBox (used for the skybox/background)
+## Project Setup
+I started with a template provided by the course which I turned into a toon shaded car inspector initially. This implemented lights, a spinning toon shaded car model, textures and a textured plane and skybox. It was pieced together from tutorials both from the OpenGL website and from the course tutorials. Below you can see the first implementation.
+![CW 1](images/gl.png)
 
-![Alt text](images/gl.png)
+I then learned about more advanced features and created a scene which implements PBR, fog, multiple lights and particles. I then added some gameplay. 
+![Final Product](images/gl1.png)
 
-- As you can see, the plane has a circle of light at the bottom, this shows that there is a spot light.
-There are also 2 combined textures on the plane which are the tiles and the rust, this means its multitextured.
+## System Info
+- I used Visual Studio 2022 to write and test the code locally.
+- OS is Widnows 11, I am using an Nvidia RTX 4070 graphics card with OpenGL version 4.6.
 
-- As for the car, you can see that it is untextured but you get a good example of how blinn phong lighting affects the car.
-You can also see that the shades of blue are hard not soft, this means that toon shading is in effect.
+## Inspiration
+My dissertation project is Gunman Drift, it is a drifting and shooting game. It has a mobile, VR, and a PC version. I thought it would be interesting to at least make a driving game in OpenGL. One of the taught features which stood out to me was fog. Heavy fog can commonly be found in horror games and a horror game that I grew up with was called “Slender: The Eight Pages”. The objective is to find all 8 pages hidden around a map while the monster “Slenderman” chases you. By this logic I added a fuel counter which runs out with time and as the player you must find all the fuel cans in the foggy map to win before you run out of fuel.
 
-- As for the skybox, it is very simple, it just loads a set of images and consructs a cube out of them which the player sits inside making it look like the environnment.
+## What makes this project unique
+The car model can be and is encouraged to be swapped out which means you could technically make any car or object the main character of this game.
 
-If you navigate to the media folder within the executable, you can find the car.obj file, if you were to find any other .obj file on the internet and place it in the same folder with the name car.obj and deleted the old one, then if you run the program, you will be able to inspect your model in the program with toon shading.
+## Possible Improvements
+I would add audio, UI, different levels, and an enemy which scares the player if they lose to further aline with the horror theme and to make this a complete game.
 
-## Controls
+## Assets
+There are some assets which I took from the internet which are used in this project:
+- https://free3d.com/3d-model/ferrari-formula-1-72527.html - F1 Car
+- Provided in tutorials - Smoke Texture
+- https://hdri-skies.com/ - Skybox
 
-You can control the scene with keyboard controls:
-- Down arrow - Zoom out
-- Up arrow - Zoom in
-- S - Toggle the car spinning
+PBR - Used to add roughness, this makes the car look metallic and gold.
 
-## Extra resources
+PBR Vertex Shader Image
 
-There are some assets which I took from the internet which are used in this project non-commercially:
-- https://sketchfab.com/3d-models/mazda-rx-7-tuned-74bf6d2d2be84bc084577a7aa5d81f68 (Mazda car model)
-- https://www.turbosquid.com/3d-models/3d-nissan-skyline-r32-gtr-model-2170757  (Skyline car model)
-- https://opengameart.org/textures/all - (Floor textures)
-- https://hdri-skies.com/ - (sky box)
+PBR Fragment Shader Image
 
-# Youtube Link
+Particle - Used to create smoke particles for the car
 
-Here is the Youtube link where I explain in more detail: https://www.youtube.com/watch?v=rsXifV7Tngo 
+Particle Vertex Shader Image
 
-# Github Link
+Particle Fragment Shader Image
 
-Here is the GitHub link:  https://github.com/ArnasPuskunigis/comp3015  
+TOON - toonSpotSingleColor 
+Toon Vertex Shader Image
+Toon Fragment Shader Image
+
+Used for the fuel cans
+SKYBOX - skyBox
+SkyboxVertex Shader Image
+Skybox Fragment Shader Image
+FOG - Added to the skybox, fuel cans, and plane
+
+
+
