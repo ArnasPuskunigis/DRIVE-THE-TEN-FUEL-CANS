@@ -6,14 +6,14 @@ in vec3 Position;
 in vec3 Normal;
 
 uniform struct LightInfo {
-    vec4 Position;   // Light position in camera coordinates.
-    vec3 L;          // Light intensity
+    vec4 Position;
+    vec3 L;
 } Light[9];
 
 uniform struct MaterialInfo {
-    float Rough;     // Roughness
-    bool Metal;      // Metallic (true) or dielectric (false)
-    vec3 Color;      // Diffuse color for dielectrics, f0 for metallic
+    float Rough;
+    bool Metal;
+    vec3 Color;
 } Material;
 
 layout(location = 0) out vec4 FragColor;
@@ -39,7 +39,7 @@ vec3 schlickFresnel(float lDotH) {
 }
 
 vec3 microfacetModel(int lightIdx, vec3 position, vec3 n) {
-    vec3 diffuseBrdf = vec3(0.0);  // default for metallic
+    vec3 diffuseBrdf = vec3(0.0);
     if (!Material.Metal) {
         diffuseBrdf = Material.Color;
     }
@@ -48,10 +48,8 @@ vec3 microfacetModel(int lightIdx, vec3 position, vec3 n) {
     vec3 lightI = Light[lightIdx].L;
 
     if (Light[lightIdx].Position.w == 0.0) {
-        // Directional light
         l = normalize(Light[lightIdx].Position.xyz);
     } else {
-        // Positional light
         l = Light[lightIdx].Position.xyz - position;
         float dist = length(l);
         l = normalize(l);
@@ -81,7 +79,6 @@ void main() {
         sum += microfacetModel(i, Position, n);
     }
 
-    // Gamma correction
     sum = pow(sum, vec3(1.0 / 2.2));
     FragColor = vec4(sum, 1.0);
 }

@@ -24,49 +24,46 @@ private:
     Plane plane;
     fuelPickup fuelCan[10];
 
-    bool hasWon;
-    float delta;
-    float carSpeed;
-    float carRotSpeed;
     GLuint texCar;
     GLuint fuelTex;
     GLuint particleTex;
     std::unique_ptr<ObjMesh> mesh;
     std::unique_ptr<ObjMesh> fuelMesh;
-    float time;
+
+    GLSLProgram particleProg;
+    GLSLProgram flatProg;
     GLSLProgram planeProg;
     GLSLProgram fuelCanProg;
     GLSLProgram skyboxProg;
     GLSLProgram pbrProg;
 
-    glm::vec4 lightPos;
+    int fuelCanCount;
+    int fuelCansRemaining;
+
+    float particleLifeTime;
+    Random rand;
+    GLuint initVel, startTime, particles, nParticles;
+    glm::vec3 emitterPos, emitterDir;
+
+    glm::vec3 carPos;
+    float carAngle;
+    glm::vec3 carForward;
+    float carSpeed;
+    float carRotSpeed;
+
+    float timeElapsed;
+    float delta;
+    float previousTime;
+    float time;
+    float carFuelCount;
+    float fuelLossRate;
+    bool hasWon;
 
     void drawScene();
     void drawFloor();
     void drawCar(const glm::vec3& pos, float rough, int metal, const glm::vec3& color);
     void drawFuelCan();
 
-    //void drawFuelCan(const glm::vec3& pos, float rough, int metal, const glm::vec3& color);
-
-    int fuelCanCount;
-    int fuelCansRemaining;
-    GLSLProgram particleProg;
-    float particleLifeTime;
-    GLSLProgram flatProg;
-    Random rand;
-    GLuint initVel, startTime, particles, nParticles;
-    Grid grid;
-    glm::vec3 emitterPos, emitterDir;
-
-    glm::vec3 carPos;
-    float carAngle;
-    glm::vec3 carForward;
-
-    float carFuelCount;
-    float previousTime;
-    float timeElapsed;
-    float fuelLossRate;
-    
     void initBuffers();
     float randFloat();
 
