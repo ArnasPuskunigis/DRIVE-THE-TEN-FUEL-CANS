@@ -132,11 +132,11 @@ private:
 				scene.animate(!scene.animating());
 
             if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-                scene.upPressed();
+                scene.upPressed(float(glfwGetTime()));
             }
             
             if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-                scene.downPressed();
+                scene.downPressed(float(glfwGetTime()));
             }
 
             if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {

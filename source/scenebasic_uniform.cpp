@@ -24,6 +24,10 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
     fuelCanCount(10),
     fuelCansRemaining(fuelCanCount),
     fuelCan(),
+    delta(),
+    carSpeed(30.0f),
+    carRotSpeed(250.0f),
+    hasWon(false),
     lightPos(vec4(0.0f, 5.0f, 0.0f, 1.0f)),
     particleLifeTime(300.0f),
     nParticles(800),
@@ -34,7 +38,7 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
     carFuelCount(100.0f),
     fuelLossRate(1.0f)
     {
-    mesh = ObjMesh::load("media/f1.obj", true);
+    mesh = ObjMesh::load("media/GunmanDrift.obj", true);
     fuelMesh = ObjMesh::load("media/fuel_can.obj", true);
     texCar = Texture::loadTexture("media/texture/f1d.png");
     fuelTex = Texture::loadTexture("media/texture/fuel_can_Albedo.png");
@@ -173,23 +177,31 @@ void SceneBasic_Uniform::update(float t)
 {
     time = t;
 
-    float delta = t - previousTime;
+    delta = t - previousTime;
     timeElapsed += delta;
 
     if (timeElapsed >= fuelLossRate)
     {
         if (carFuelCount > 0)
         {
-            timeElapsed = 0.0f;
-            carFuelCount -= 5.0f;
-            std::cout << "Car fuel at: " << carFuelCount << std::endl;
+            if (!hasWon) {
+                timeElapsed = 0.0f;
+                carFuelCount -= 10.0f;
+                std::cout << "Car fuel at: " << carFuelCount << std::endl;
+            }
         }
         else
         {
-            exit(0);
+            if (!hasWon) {
+                std::cout << "YOU LOSE!!!" << std::endl;
+                exit(0);
+            }
         }
     }
     previousTime = t;
+
+    //float fps = 1.0f / delta;
+    //std::cout << "FPS: " << fps << std::endl;
 
 }
 
@@ -235,7 +247,16 @@ void SceneBasic_Uniform::render()
                 std::cout << "Car fuel at: " << carFuelCount << std::endl;
                 fuelCansRemaining -= 1;
                 std::cout << "FUEL CANS REMAINING: " << fuelCansRemaining << "/" << fuelCanCount << std::endl;
+
+                if (fuelCansRemaining == 0) {
+                    hasWon = true;
+                    std::cout << "YOU WIN!!!" << std::endl;
+                }
+
             }
+
+           
+
         }
     }
 
@@ -348,7 +369,7 @@ void SceneBasic_Uniform::drawCar(const glm::vec3& pos, float rough, int metal, c
     model = mat4(1.0f);
     model = translate(model, vec3(pos));
     model = rotate(model, radians(carAngle), vec3(0.0f, 1.0f, 0.0f));
-    model = glm::scale(model, vec3(0.02f));
+    model = glm::scale(model, vec3(2.0f));
     setMatricesPbr();
     mesh->render();
     carForward = -glm::normalize(glm::vec3(model[0]));
@@ -470,20 +491,20 @@ float SceneBasic_Uniform::randFloat() {
     return rand.nextFloat();
 }
 
-void SceneBasic_Uniform::upPressed() {
-    carPos += carForward * 0.1f;
+void SceneBasic_Uniform::upPressed(float t) {
+    carPos += carForward * carSpeed * delta;
 }
 
-void SceneBasic_Uniform::downPressed() {
-    carPos -= carForward * 0.1f;
+void SceneBasic_Uniform::downPressed(float t) {
+    carPos -= carForward * carSpeed * delta;
 }
 
 void SceneBasic_Uniform::leftPressed() {
-    carAngle += 1.0f;
+    carAngle += carRotSpeed * delta;
 
 }
 
 void SceneBasic_Uniform::rightPressed() {
-    carAngle -= 1.0f;
+    carAngle -= carRotSpeed * delta;
 
 }

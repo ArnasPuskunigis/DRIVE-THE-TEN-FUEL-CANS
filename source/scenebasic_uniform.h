@@ -24,7 +24,10 @@ private:
     Plane plane;
     fuelPickup fuelCan[10];
 
-
+    bool hasWon;
+    float delta;
+    float carSpeed;
+    float carRotSpeed;
     GLuint texCar;
     GLuint fuelTex;
     GLuint particleTex;
@@ -83,8 +86,8 @@ public:
     void update(float t);
     void render();
     void resize(int, int);
-    void upPressed();
-    void downPressed();
+    void upPressed(float t);
+    void downPressed(float t);
     void leftPressed();
     void rightPressed();
 };
