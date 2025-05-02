@@ -2,11 +2,14 @@
 #include <glm/glm.hpp>
 #include <iostream>
 
+//Constructors
 fuelPickup::fuelPickup()
     : position(0.0f), radius(2.0f), collected(false) {}
 
 fuelPickup::fuelPickup(glm::vec3& pos, float radius)
     : position(pos), radius(radius), collected(false) {}
+
+
 
 void fuelPickup::updatePosition(glm::vec3 pos) {
     position = pos;

@@ -9,11 +9,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "glm/glm.hpp"
 #include "helper/plane.h"
-#include "helper/teapot.h"
 #include "helper/objmesh.h"
 #include "helper/skybox.h"
 #include "helper/random.h"
-#include "helper/grid.h"
 #include "helper/particleutils.h"
 #include "helper/fuelPickup.h"
 
@@ -33,7 +31,7 @@ private:
     GLSLProgram particleProg;
     GLSLProgram flatProg;
     GLSLProgram planeProg;
-    GLSLProgram fuelCanProg;
+    GLSLProgram toonProg;
     GLSLProgram skyboxProg;
     GLSLProgram pbrProg;
 
@@ -83,8 +81,8 @@ public:
     void update(float t);
     void render();
     void resize(int, int);
-    void upPressed(float t);
-    void downPressed(float t);
+    void upPressed();
+    void downPressed();
     void leftPressed();
     void rightPressed();
 };

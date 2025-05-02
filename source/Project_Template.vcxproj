@@ -150,27 +150,20 @@
     <ClCompile Include="helper\fuelPickup.cpp" />
     <ClCompile Include="helper\glslprogram.cpp" />
     <ClCompile Include="helper\glutils.cpp" />
-    <ClCompile Include="helper\grid.cpp" />
     <ClCompile Include="helper\objmesh.cpp" />
     <ClCompile Include="helper\plane.cpp" />
     <ClCompile Include="helper\skybox.cpp" />
     <ClCompile Include="helper\stb\stb_image.cpp" />
-    <ClCompile Include="helper\teapot.cpp" />
     <ClCompile Include="helper\texture.cpp" />
-    <ClCompile Include="helper\torus.cpp" />
     <ClCompile Include="helper\trianglemesh.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="scenebasic_uniform.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="shader\multiTextureSpotToon.frag" />
-    <None Include="shader\multiTextureSpotToon.vert" />
     <None Include="shader\particle.frag" />
     <None Include="shader\particle.vert" />
     <None Include="shader\pbr.frag" />
     <None Include="shader\pbr.vert" />
-    <None Include="shader\solid.frag" />
-    <None Include="shader\solid.vert" />
     <None Include="shader\toonSpotSingleColor.frag" />
     <None Include="shader\toonSpotSingleColor.vert" />
     <None Include="shader\skyBox.frag" />
@@ -183,7 +176,6 @@
     <ClInclude Include="helper\fuelPickup.h" />
     <ClInclude Include="helper\glslprogram.h" />
     <ClInclude Include="helper\glutils.h" />
-    <ClInclude Include="helper\grid.h" />
     <ClInclude Include="helper\objmesh.h" />
     <ClInclude Include="helper\particleutils.h" />
     <ClInclude Include="helper\plane.h" />
@@ -193,10 +185,7 @@
     <ClInclude Include="helper\skybox.h" />
     <ClInclude Include="helper\stb\stb_image.h" />
     <ClInclude Include="helper\stb\stb_image_write.h" />
-    <ClInclude Include="helper\teapot.h" />
-    <ClInclude Include="helper\teapotdata.h" />
     <ClInclude Include="helper\texture.h" />
-    <ClInclude Include="helper\torus.h" />
     <ClInclude Include="helper\trianglemesh.h" />
     <ClInclude Include="helper\utils.h" />
     <ClInclude Include="scenebasic_uniform.h" />

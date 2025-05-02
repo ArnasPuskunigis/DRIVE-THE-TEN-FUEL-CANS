@@ -36,9 +36,10 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
     carFuelCount(100.0f),
     fuelLossRate(1.0f)
     {
-    mesh = ObjMesh::load("media/GunmanDrift2.obj", true);
+    mesh = ObjMesh::load("media/Car.obj", true);
     fuelMesh = ObjMesh::load("media/fuel_can.obj", true);
     texCar = Texture::loadTexture("media/texture/f1d.png");
+
     fuelTex = Texture::loadTexture("media/texture/fuel_can_Albedo.png");
     particleTex = Texture::loadTexture("media/texture/fuel_can_Albedo.png");
     }
@@ -78,7 +79,7 @@ void SceneBasic_Uniform::initScene()
     particleProg.setUniform("Gravity", vec3(0.0f, 2.0f, 0.0f));
     particleProg.setUniform("EmitterPos", emitterPos);
 
-    //Fuel Cans
+    //Fuel Cans (Toon with texture)
 
     float randX = 0;
     float randZ = 0;
@@ -92,17 +93,17 @@ void SceneBasic_Uniform::initScene()
 
     std::cout << "FUEL CANS REMAINING: " << fuelCansRemaining << "/" << fuelCanCount << std::endl;
 
-    fuelCanProg.use();
+    toonProg.use();
     model = mat4(1.0f);
     projection = mat4(1.0f);
-    fuelCanProg.setUniform("Spot.L", vec3(0.5f));
-    fuelCanProg.setUniform("Spot.La", vec3(0.5f));
-    fuelCanProg.setUniform("Spot.Exponent", 0.5f);
-    fuelCanProg.setUniform("Spot.Cutoff", glm::radians(30.0f));
+    toonProg.setUniform("Spot.L", vec3(0.5f));
+    toonProg.setUniform("Spot.La", vec3(0.5f));
+    toonProg.setUniform("Spot.Exponent", 0.5f);
+    toonProg.setUniform("Spot.Cutoff", glm::radians(30.0f));
 
-    fuelCanProg.setUniform("Fog.MaxDist", 50.0f);
-    fuelCanProg.setUniform("Fog.MinDist", 1.0f);
-    fuelCanProg.setUniform("Fog.Color", vec3(0.5f, 0.5f, 0.5f));
+    toonProg.setUniform("Fog.MaxDist", 50.0f);
+    toonProg.setUniform("Fog.MinDist", 1.0f);
+    toonProg.setUniform("Fog.Color", vec3(0.5f, 0.5f, 0.5f));
 
     std::cout << "Car fuel count:" << carFuelCount << std::endl;
 
@@ -147,9 +148,9 @@ void SceneBasic_Uniform::compile()
         particleProg.compileShader("shader/particle.frag");
         particleProg.link();
 
-        fuelCanProg.compileShader("shader/toonSpotSingleColor.vert");
-        fuelCanProg.compileShader("shader/toonSpotSingleColor.frag");
-        fuelCanProg.link();
+        toonProg.compileShader("shader/toonSpotSingleColor.vert");
+        toonProg.compileShader("shader/toonSpotSingleColor.frag");
+        toonProg.link();
 
         skyboxProg.compileShader("shader/skyBox.vert");
         skyboxProg.compileShader("shader/skyBox.frag");
@@ -290,26 +291,26 @@ void SceneBasic_Uniform::drawScene()
 
 void SceneBasic_Uniform::drawFuelCan() 
 {
-    fuelCanProg.use();
+    toonProg.use();
 
-    fuelCanProg.setUniform("Spot.Position", vec3(view * vec4(0.0f, 5.0f, 0.0f, 1.0f)));
-    fuelCanProg.setUniform("Material.Kd", vec3(0.0f, 0.0f, 1.0f));
-    fuelCanProg.setUniform("Material.Ks", vec3(0.95f, 0.95f, 0.95f));
-    fuelCanProg.setUniform("Material.Ka", vec3(0.2f, 0.2f, 0.2f));
-    fuelCanProg.setUniform("Material.Shininess", 100.0f);
+    toonProg.setUniform("Spot.Position", vec3(view * vec4(0.0f, 5.0f, 0.0f, 1.0f)));
+    toonProg.setUniform("Material.Kd", vec3(0.0f, 0.0f, 1.0f));
+    toonProg.setUniform("Material.Ks", vec3(0.95f, 0.95f, 0.95f));
+    toonProg.setUniform("Material.Ka", vec3(0.2f, 0.2f, 0.2f));
+    toonProg.setUniform("Material.Shininess", 100.0f);
 
 }
 
 void SceneBasic_Uniform::drawFloor()
 {
-    fuelCanProg.use();
+    toonProg.use();
 
-    fuelCanProg.setUniform("Spot.Position", vec3(view * vec4(0.0, 5.0f, 0.0f, 1.0f)));
+    toonProg.setUniform("Spot.Position", vec3(view * vec4(0.0, 5.0f, 0.0f, 1.0f)));
 
-    fuelCanProg.setUniform("Material.Kd", vec3(0.0f, 0.0f, 1.0f));
-    fuelCanProg.setUniform("Material.Ks", vec3(0.95f, 0.95f, 0.95f));
-    fuelCanProg.setUniform("Material.Ka", vec3(0.2f, 0.2f, 0.2f));
-    fuelCanProg.setUniform("Material.Shininess", 100.0f);
+    toonProg.setUniform("Material.Kd", vec3(0.0f, 0.0f, 1.0f));
+    toonProg.setUniform("Material.Ks", vec3(0.95f, 0.95f, 0.95f));
+    toonProg.setUniform("Material.Ka", vec3(0.2f, 0.2f, 0.2f));
+    toonProg.setUniform("Material.Shininess", 100.0f);
     
     model = mat4(1.0f);
     model = translate(model, vec3(0.0f, -0.75f, 0.0f));
@@ -334,11 +335,11 @@ void SceneBasic_Uniform::drawCar(const glm::vec3& pos, float rough, int metal, c
 }
 
 void SceneBasic_Uniform::setMatricesPlane() {
-    fuelCanProg.use();
+    toonProg.use();
     mat4 mv = view * model;
-    fuelCanProg.setUniform("ModelViewMatrix", mv);
-    fuelCanProg.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
-    fuelCanProg.setUniform("MVP", projection * mv);
+    toonProg.setUniform("ModelViewMatrix", mv);
+    toonProg.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
+    toonProg.setUniform("MVP", projection * mv);
 }
 
 void SceneBasic_Uniform::setMatricesPbr() {
@@ -351,11 +352,11 @@ void SceneBasic_Uniform::setMatricesPbr() {
 }
 
 void SceneBasic_Uniform::setMatricesCar() {
-    fuelCanProg.use();
+    toonProg.use();
     mat4 mv = view * model;
-    fuelCanProg.setUniform("ModelViewMatrix", mv);
-    fuelCanProg.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
-    fuelCanProg.setUniform("MVP", projection * mv);
+    toonProg.setUniform("ModelViewMatrix", mv);
+    toonProg.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
+    toonProg.setUniform("MVP", projection * mv);
 }
 
 void SceneBasic_Uniform::setMatricesSkybox() {
@@ -432,11 +433,11 @@ float SceneBasic_Uniform::randFloat() {
     return rand.nextFloat();
 }
 
-void SceneBasic_Uniform::upPressed(float t) {
+void SceneBasic_Uniform::upPressed() {
     carPos += carForward * carSpeed * delta;
 }
 
-void SceneBasic_Uniform::downPressed(float t) {
+void SceneBasic_Uniform::downPressed() {
     carPos -= carForward * carSpeed * delta;
 }
 

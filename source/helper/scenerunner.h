@@ -131,35 +131,19 @@ private:
 			if (state == GLFW_PRESS)
 				scene.animate(!scene.animating());
 
-            if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-                scene.upPressed(float(glfwGetTime()));
+            if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+                scene.upPressed();
             }
 
-            if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-                scene.upPressed(float(glfwGetTime()));
-            }
-            
-            if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-                scene.downPressed(float(glfwGetTime()));
+            if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+                scene.downPressed();
             }
 
-            if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-                scene.downPressed(float(glfwGetTime()));
-            }
-
-            if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+            if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
                 scene.leftPressed();
             }
 
-            if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-                scene.rightPressed();
-            }
-
-            if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-                scene.leftPressed();
-            }
-
-            if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+            if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
                 scene.rightPressed();
             }
 
