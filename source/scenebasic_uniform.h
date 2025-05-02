@@ -56,7 +56,7 @@ private:
     Random rand;
     GLuint initVel, startTime, particles, nParticles;
     Grid grid;
-    glm::vec3 emitterPos, emitterDir;
+    glm::vec3 emitterPos, emitterPos2, emitterDir;
 
     glm::vec3 carPos;
     float carAngle;

@@ -31,7 +31,8 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
     lightPos(vec4(0.0f, 5.0f, 0.0f, 1.0f)),
     particleLifeTime(300.0f),
     nParticles(800),
-    emitterPos(250, 50, 0),
+    emitterPos(350, 10, -50),
+    emitterPos2(350, 10, 50),
     emitterDir(90, 1, -120),
     carPos(0.0f, 1.0f, 0.0f),
     carForward(0.0f, 1.0f, 0.0f),
@@ -72,6 +73,7 @@ void SceneBasic_Uniform::initScene()
     glFrontFace(GL_CW);
 
     initBuffers();
+
     glActiveTexture(GL_TEXTURE0);
     particleTex = Texture::loadTexture("media/texture/smoke.png");
 
@@ -82,16 +84,16 @@ void SceneBasic_Uniform::initScene()
     particleProg.setUniform("Gravity", vec3(0.0f, 2.0f, 0.0f));
     particleProg.setUniform("EmitterPos", emitterPos);
 
-    //Fuel Cans
+   
 
-    
+    //Fuel Cans
 
     float randX = 0;
     float randZ = 0;
     for (int i = 0; i <= fuelCanCount - 1; i++)
     {
-        randX = glm::mix(-100.0f, 100.0f, randFloat());
-        randZ = glm::mix(-100.0f, 100.0f, randFloat());
+        randX = glm::mix(-120.0f, 120.0f, randFloat());
+        randZ = glm::mix(-120.0f, 120.0f, randFloat());
         fuelCan[i].updatePosition(vec3(randX, 1.0f, randZ));
         std::cout << "FUEL CAN SPAWNED!" << std::endl;
     }
@@ -369,7 +371,7 @@ void SceneBasic_Uniform::drawCar(const glm::vec3& pos, float rough, int metal, c
     model = mat4(1.0f);
     model = translate(model, vec3(pos));
     model = rotate(model, radians(carAngle), vec3(0.0f, 1.0f, 0.0f));
-    model = glm::scale(model, vec3(2.0f));
+    model = glm::scale(model, vec3(0.02f));
     setMatricesPbr();
     mesh->render();
     carForward = -glm::normalize(glm::vec3(model[0]));
