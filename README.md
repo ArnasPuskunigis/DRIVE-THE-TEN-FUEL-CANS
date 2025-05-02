@@ -51,30 +51,27 @@ There are some assets which I took from the internet which are used in this proj
 - https://hdri-skies.com/ - Skybox
 
 ## Code
-As mentioned in the video, this was created using a template. My contributions consist of modifying an existing template, implementing and mixing various shader techniques, and the addition of gameplay.
+As mentioned in the video, this was created using a template. My contributions consist of modifying an existing template, implementing and mixing various shader techniques, and the addition of a gameplay loop.
 
 ### PBR Shader
-Used to add roughness, this makes the car look like gold.
+Used to add roughness, this makes the car look like gold in the light.
+![PBR Vertex Shader](images/PbrVert.png)
+![PBR Fragment Shader](images/PbrFrag.png)
 
-PBR Vertex Shader Image
+### Particle Shader 
+Used to create smoke particles for the car's exhaust.
+![Particle Vertex Shader](images/ParticleVert.png)
+![Particle Fragment Shader](images/ParticleFrag.png)
 
-PBR Fragment Shader Image
+### Toon Shader
+Used for the fuel cans and the floor, implements textures and handles fog.
+![Toon Vertex Shader](images/ToonVert.png)
+![Toon Fragment Shader](images/ToonFrag.png)
 
-Particle - Used to create smoke particles for the car
-
-Particle Vertex Shader Image
-
-Particle Fragment Shader Image
-
-TOON - toonSpotSingleColor 
-Toon Vertex Shader Image
-Toon Fragment Shader Image
-
-Used for the fuel cans
-SKYBOX - skyBox
-SkyboxVertex Shader Image
-Skybox Fragment Shader Image
-FOG - Added to the skybox, fuel cans, and plane
+### Skybox Shader
+Used for the skybox, also handles fog.
+![Skybox Vertex Shader](images/SkyboxVert.png)
+![Skybox Fragment Shader](images/SkyboxFrag.png)
 
 
 
