@@ -33,7 +33,7 @@ I then learned about more advanced features and created a scene which implements
 
 ## System Info
 - I used Visual Studio 2022 to write and test the code locally.
-- OS is Widnows 11, I am using an Nvidia RTX 4070 graphics card with OpenGL version 4.6.
+- OS is Windows 11, I am using an Nvidia RTX 4070 graphics card with OpenGL version 4.6.
 
 ## Inspiration
 My dissertation project is Gunman Drift, it is a drifting and shooting game. It has a mobile, VR, and a PC version. I thought it would be interesting to at least make a driving game in OpenGL. One of the taught features which stood out to me was fog. Heavy fog can commonly be found in horror games and a horror game that I grew up with was called “Slender: The Eight Pages”. The objective is to find all 8 pages hidden around a map while the monster “Slenderman” chases you. By this logic I added a fuel counter which runs out with time and as the player you must find all the fuel cans in the foggy map to win before you run out of fuel.
