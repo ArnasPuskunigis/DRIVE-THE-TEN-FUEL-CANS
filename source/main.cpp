@@ -5,7 +5,7 @@
 
 int main(int argc, char* argv[])
 {
-	SceneRunner runner("Toon Shaded Car Inspector");
+	SceneRunner runner("DRIVE: THE TEN FUEL CANS");
 
 	std::unique_ptr<Scene> scene;
 
