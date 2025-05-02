@@ -32,14 +32,13 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
     particleLifeTime(300.0f),
     nParticles(800),
     emitterPos(350, 10, -50),
-    emitterPos2(350, 10, 50),
     emitterDir(90, 1, -120),
     carPos(0.0f, 1.0f, 0.0f),
     carForward(0.0f, 1.0f, 0.0f),
     carFuelCount(100.0f),
     fuelLossRate(1.0f)
     {
-    mesh = ObjMesh::load("media/GunmanDrift.obj", true);
+    mesh = ObjMesh::load("media/GunmanDrift2.obj", true);
     fuelMesh = ObjMesh::load("media/fuel_can.obj", true);
     texCar = Texture::loadTexture("media/texture/f1d.png");
     fuelTex = Texture::loadTexture("media/texture/fuel_can_Albedo.png");
@@ -84,16 +83,14 @@ void SceneBasic_Uniform::initScene()
     particleProg.setUniform("Gravity", vec3(0.0f, 2.0f, 0.0f));
     particleProg.setUniform("EmitterPos", emitterPos);
 
-   
-
     //Fuel Cans
 
     float randX = 0;
     float randZ = 0;
     for (int i = 0; i <= fuelCanCount - 1; i++)
     {
-        randX = glm::mix(-120.0f, 120.0f, randFloat());
-        randZ = glm::mix(-120.0f, 120.0f, randFloat());
+        randX = glm::mix(-100.0f, 100.0f, randFloat());
+        randZ = glm::mix(-100.0f, 100.0f, randFloat());
         fuelCan[i].updatePosition(vec3(randX, 1.0f, randZ));
         std::cout << "FUEL CAN SPAWNED!" << std::endl;
     }
@@ -125,13 +122,24 @@ void SceneBasic_Uniform::initScene()
 
     //Lighting for PBR
     pbrProg.use();
-    pbrProg.setUniform("Light[0].L", vec3(45.0f));
+    pbrProg.setUniform("Light[0].L", vec3(100.0f));
     pbrProg.setUniform("Light[0].Position", view * lightPos);
-    pbrProg.setUniform("Light[1].L", vec3(45.0f));
+    pbrProg.setUniform("Light[1].L", vec3(100.0f));
     pbrProg.setUniform("Light[1].Position", view * vec4(50.0f, 5.0f, 50.0f, 1.0f));
-    pbrProg.setUniform("Light[2].L", vec3(45.0f));
+    pbrProg.setUniform("Light[2].L", vec3(100.0f));
     pbrProg.setUniform("Light[2].Position", view * vec4(-50.0f, 5.0f, -50.0f, 1.0f));
-
+    pbrProg.setUniform("Light[3].L", vec3(100.0f));
+    pbrProg.setUniform("Light[3].Position", view * vec4(-50.0f, 5.0f, 50.0f, 1.0f));
+    pbrProg.setUniform("Light[4].L", vec3(100.0f));
+    pbrProg.setUniform("Light[4].Position", view * vec4(50.0f, 5.0f, -50.0f, 1.0f));
+    pbrProg.setUniform("Light[5].L", vec3(100.0f));
+    pbrProg.setUniform("Light[5].Position", view * vec4(100.0f, 5.0f, 100.0f, 1.0f));
+    pbrProg.setUniform("Light[6].L", vec3(100.0f));
+    pbrProg.setUniform("Light[6].Position", view * vec4(-100.0f, 5.0f, 100.0f, 1.0f));
+    pbrProg.setUniform("Light[7].L", vec3(100.0f));
+    pbrProg.setUniform("Light[7].Position", view * vec4(-100.0f, 5.0f, -100.0f, 1.0f));
+    pbrProg.setUniform("Light[8].L", vec3(100.0f));
+    pbrProg.setUniform("Light[8].Position", view * vec4(100.0f, 5.0f, -100.0f, 1.0f));
 }
 
 void SceneBasic_Uniform::compile()
@@ -275,7 +283,12 @@ void SceneBasic_Uniform::render()
     pbrProg.setUniform("Light[0].Position", view * lightPos);
     pbrProg.setUniform("Light[1].Position", view * vec4(50.0f, 5.0f, 50.0f, 1.0f));
     pbrProg.setUniform("Light[2].Position", view * vec4(-50.0f, 5.0f, -50.0f, 1.0f));
-
+    pbrProg.setUniform("Light[3].Position", view * vec4(-50.0f, 5.0f, 50.0f, 1.0f));
+    pbrProg.setUniform("Light[4].Position", view * vec4(50.0f, 5.0f, -50.0f, 1.0f));
+    pbrProg.setUniform("Light[5].Position", view * vec4(100.0f, 5.0f, 100.0f, 1.0f));
+    pbrProg.setUniform("Light[6].Position", view * vec4(-100.0f, 5.0f, 100.0f, 1.0f));
+    pbrProg.setUniform("Light[7].Position", view * vec4(-100.0f, 5.0f, -100.0f, 1.0f));
+    pbrProg.setUniform("Light[8].Position", view * vec4(100.0f, 5.0f, -100.0f, 1.0f));
 
     //Particles
     glBindTexture(GL_TEXTURE_2D, particleTex);

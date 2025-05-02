@@ -8,7 +8,7 @@ in vec3 Normal;
 uniform struct LightInfo {
     vec4 Position;   // Light position in camera coordinates.
     vec3 L;          // Light intensity
-} Light[3];
+} Light[9];
 
 uniform struct MaterialInfo {
     float Rough;     // Roughness
@@ -77,7 +77,7 @@ void main() {
     vec3 sum = vec3(0.0);
     vec3 n = normalize(Normal);
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 9; i++) {
         sum += microfacetModel(i, Position, n);
     }
 
