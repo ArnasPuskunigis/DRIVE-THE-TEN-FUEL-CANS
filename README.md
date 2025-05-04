@@ -55,22 +55,30 @@ As mentioned in the video, this was created using a template. My contributions c
 
 ### PBR Shader
 Used to add roughness, this makes the car look like gold in the light.
+Vertex
 ![PBR Vertex Shader](images/PbrVert.png)
+Fragment
 ![PBR Fragment Shader](images/PbrFrag.png)
 
 ### Particle Shader 
 Used to create smoke particles for the car's exhaust.
+Vertex
 ![Particle Vertex Shader](images/ParticleVert.png)
+Fragment
 ![Particle Fragment Shader](images/ParticleFrag.png)
 
 ### Toon Shader
 Used for the fuel cans and the floor, implements textures and handles fog.
+Vertex
 ![Toon Vertex Shader](images/ToonVert.png)
+Fragment
 ![Toon Fragment Shader](images/ToonFrag.png)
 
 ### Skybox Shader
 Used for the skybox, also handles fog.
+Vertex
 ![Skybox Vertex Shader](images/SkyboxVert.png)
+Fragment
 ![Skybox Fragment Shader](images/SkyboxFrag.png)
 
 
