@@ -1,5 +1,4 @@
-# COMP3015 CW2
-## DRIVE: THE TEN FUEL CANS
+# DRIVE: THE TEN FUEL CANS
 You just woke up in your car, in a foggy abandoned building. Your car is running out of fuel and you need to find and collect all 10 fuel cans to survive.
 
 ![GAME](images/Cover.png)
